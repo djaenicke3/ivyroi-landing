@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledger — spend adjudication for AI</title>
+<meta name="description" content="Ledger sits between your agents and the models. It reads what each agent actually does, weighs it against what its owner claimed, and gives finance one decision to make.">
+<meta name="theme-color" content="#FBFAF7">
+<link rel="canonical" href="https://ivyroi.com/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231B4FC4'/><path d='M9 10h14M9 16h14M9 22h8' stroke='white' stroke-width='2.6' stroke-linecap='round'/></svg>">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ivyroi.com/">
+<meta property="og:title" content="Ledger — spend adjudication for AI">
+<meta property="og:description" content="Ledger sits between your agents and the models. It reads what each agent actually does, weighs it against what its owner claimed, and gives finance one decision to make.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ledger — spend adjudication for AI">
+<meta name="twitter:description" content="Ledger sits between your agents and the models. It reads what each agent actually does, weighs it against what its owner claimed, and gives finance one decision to make.">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #FBFAF7; scroll-behavior: smooth; }
+  * { box-sizing: border-box; }
+  a { color: #1B4FC4; text-decoration: none; }
+  a:hover { color: #143a92; text-decoration: underline; }
+  button, input, select, textarea { font: inherit; }
+  ::selection { background: #D8E3F8; }
+  section[id] { scroll-margin-top: 76px; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 26px; background: transparent; cursor: pointer; }
+  input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 999px; background: #E7E3DA; }
+  input[type=range]::-moz-range-track { height: 6px; border-radius: 999px; background: #E7E3DA; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%; background: #1B4FC4; border: 3px solid #fff; box-shadow: 0 1px 3px rgba(23,20,15,0.28); }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #1B4FC4; border: 3px solid #fff; box-shadow: 0 1px 3px rgba(23,20,15,0.28); }
+  input[type=range]:focus-visible { outline: 2px solid #1B4FC4; outline-offset: 4px; border-radius: 999px; }
+  @keyframes flow { to { stroke-dashoffset: -168; } }
+  @keyframes gateDrop { 0% { opacity: 0; transform: translateY(-26px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes caret { 50% { opacity: 0; } }
+  @keyframes cardIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 760px) { .nav-links, .nav-tagline { display: none !important; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</helmet>
+
+<div style="background:#FBFAF7;color:#17140F;font-family:'Figtree',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.62">
+
+  <header style="position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px clamp(18px,4vw,38px);background:rgba(251,250,247,0.93);backdrop-filter:blur(10px);border-bottom:1px solid #E7E3DA">
+    <div style="display:flex;align-items:baseline;gap:15px">
+      <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.025em">Ledger</span>
+      <span class="nav-tagline" style="font-size:13.5px;color:#8A8275">Spend adjudication</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:24px">
+      <span class="nav-links" style="display:flex;align-items:center;gap:24px">
+        <a href="#pane" style="font-size:14.5px;color:#5C564D" style-hover="color:#17140F;text-decoration:none">One pane</a>
+        <a href="#leak" style="font-size:14.5px;color:#5C564D" style-hover="color:#17140F;text-decoration:none">The leak</a>
+        <a href="#read" style="font-size:14.5px;color:#5C564D" style-hover="color:#17140F;text-decoration:none">The read</a>
+        <a href="#call" style="font-size:14.5px;color:#5C564D" style-hover="color:#17140F;text-decoration:none">The call</a>
+        <a href="#trust" style="font-size:14.5px;color:#5C564D" style-hover="color:#17140F;text-decoration:none">What we keep</a>
+      </span>
+      <a href="#walkthrough" style="padding:10px 18px;border-radius:8px;background:#17140F;color:#FBFAF7;font-weight:600;font-size:14.5px" style-hover="background:#000;text-decoration:none">Book a walkthrough</a>
+    </div>
+  </header>
+
+  <section style="padding:clamp(44px,6vw,72px) clamp(20px,4vw,38px) clamp(40px,5vw,60px)">
+    <div style="max-width:1220px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:clamp(32px,4vw,56px);align-items:center">
+      <div>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+          <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">COST CONTROL FOR AI SPEND</span>
+        </div>
+        <h1 style="margin:0;font-family:'Outfit',sans-serif;font-size:clamp(37px,5vw,64px);line-height:1.04;font-weight:600;letter-spacing:-0.035em;text-wrap:balance">Your model bill doubled. Your evidence didn't.</h1>
+        <p style="margin:22px 0 0;font-size:18.5px;color:#5C564D;max-width:50ch;text-wrap:pretty">Every agent made a promise to get funded. Ledger reads the traffic and tells you which ones kept it.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:30px">
+          <a href="#walkthrough" style="padding:14px 25px;border-radius:9px;background:#17140F;color:#FBFAF7;font-weight:600" style-hover="background:#000;text-decoration:none">Book a walkthrough</a>
+          <a href="#leak" style="padding:14px 23px;border-radius:9px;border:1px solid #E7E3DA;color:#17140F;font-weight:600;background:#fff" style-hover="border-color:#C9C2B5;text-decoration:none">See what it catches</a>
+        </div>
+        <p style="margin:24px 0 0;font-size:14.5px;color:#8A8275">Everything below is live. Go and poke it.</p>
+      </div>
+
+      <div style="min-width:0">
+        <div style="position:relative;padding-bottom:72px">
+        <svg viewBox="0 0 640 380" style="width:100%;height:auto;display:block" role="img" aria-label="Agents routed through Ledger into one of four verdicts">
+          <sc-for list="{{ hero.links }}" as="hl" hint-placeholder-count="5">
+            <path d="{{ hl.d }}" fill="none" stroke="#E7E3DA" stroke-width="1.5"></path>
+            <path d="{{ hl.d }}" fill="none" stroke="#1B4FC4" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 165" style="{{ hl.anim }}"></path>
+          </sc-for>
+          <sc-for list="{{ hero.outs }}" as="ho" hint-placeholder-count="4">
+            <path d="{{ ho.d }}" fill="none" stroke="#E7E3DA" stroke-width="1.5"></path>
+            <path d="{{ ho.d }}" fill="none" stroke="{{ ho.dot }}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 165" style="{{ ho.anim }}"></path>
+          </sc-for>
+          <g>
+            <rect x="4" y="70" width="168" height="48" rx="10" fill="#FFFFFF" stroke="{{ hero.t0.stroke }}" stroke-width="{{ hero.t0.sw }}"></rect>
+            <circle cx="28" cy="78" r="2" fill="#1B4FC4"></circle>
+            <circle cx="28" cy="87" r="6" fill="#E8F0FB"></circle>
+            <rect x="19" y="95" width="18" height="11" rx="4" fill="#E8F0FB"></rect>
+            <text x="50" y="92" font-family="Figtree,sans-serif" font-size="13" font-weight="600" fill="#17140F">Invoice Triage</text>
+            <text x="50" y="107" font-family="Figtree,sans-serif" font-size="11.5" fill="#8A8275">Finance Ops</text>
+          </g>
+          <g>
+            <rect x="4" y="132" width="168" height="48" rx="10" fill="#FFFFFF" stroke="{{ hero.t1.stroke }}" stroke-width="{{ hero.t1.sw }}"></rect>
+            <circle cx="28" cy="140" r="2" fill="#2F6B4F"></circle>
+            <circle cx="28" cy="149" r="6" fill="#E9F2EB"></circle>
+            <rect x="19" y="157" width="18" height="11" rx="4" fill="#E9F2EB"></rect>
+            <text x="50" y="154" font-family="Figtree,sans-serif" font-size="13" font-weight="600" fill="#17140F">Support Drafts</text>
+            <text x="50" y="169" font-family="Figtree,sans-serif" font-size="11.5" fill="#8A8275">Support</text>
+          </g>
+          <g>
+            <rect x="4" y="194" width="168" height="48" rx="10" fill="#FFFFFF" stroke="{{ hero.t2.stroke }}" stroke-width="{{ hero.t2.sw }}"></rect>
+            <circle cx="28" cy="202" r="2" fill="#8A6A1F"></circle>
+            <circle cx="28" cy="211" r="6" fill="#FBF3E0"></circle>
+            <rect x="19" y="219" width="18" height="11" rx="4" fill="#FBF3E0"></rect>
+            <text x="50" y="216" font-family="Figtree,sans-serif" font-size="13" font-weight="600" fill="#17140F">Log Reviewer</text>
+            <text x="50" y="231" font-family="Figtree,sans-serif" font-size="11.5" fill="#8A8275">IT Security</text>
+          </g>
+          <g>
+            <rect x="4" y="256" width="168" height="48" rx="10" fill="#FFFFFF" stroke="{{ hero.t3.stroke }}" stroke-width="{{ hero.t3.sw }}"></rect>
+            <circle cx="28" cy="264" r="2" fill="#8F3B3B"></circle>
+            <circle cx="28" cy="273" r="6" fill="#FAEDE9"></circle>
+            <rect x="19" y="281" width="18" height="11" rx="4" fill="#FAEDE9"></rect>
+            <text x="50" y="278" font-family="Figtree,sans-serif" font-size="13" font-weight="600" fill="#17140F">Recruiting Screener</text>
+            <text x="50" y="293" font-family="Figtree,sans-serif" font-size="11.5" fill="#8A8275">People</text>
+          </g>
+          <g>
+            <rect x="4" y="318" width="168" height="48" rx="10" fill="#FFFFFF" stroke="{{ hero.t4.stroke }}" stroke-width="{{ hero.t4.sw }}"></rect>
+            <circle cx="28" cy="326" r="2" fill="#2F6B4F"></circle>
+            <circle cx="28" cy="335" r="6" fill="#E9F2EB"></circle>
+            <rect x="19" y="343" width="18" height="11" rx="4" fill="#E9F2EB"></rect>
+            <text x="50" y="340" font-family="Figtree,sans-serif" font-size="13" font-weight="600" fill="#17140F">Migration Bot</text>
+            <text x="50" y="355" font-family="Figtree,sans-serif" font-size="11.5" fill="#8A8275">Data Platform</text>
+          </g>
+          <rect x="258" y="162" width="112" height="112" rx="16" fill="#1B4FC4"></rect>
+          <text x="314" y="212" text-anchor="middle" font-family="Outfit,sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Ledger</text>
+          <text x="314" y="231" text-anchor="middle" font-family="Figtree,sans-serif" font-size="11" fill="#BDCDEE">reads the work</text>
+          <g>
+            <rect x="452" y="98" width="184" height="48" rx="10" fill="{{ hero.b0.fill }}" stroke="{{ hero.b0.stroke }}" stroke-width="{{ hero.b0.sw }}"></rect>
+            <text x="470" y="119" font-family="Outfit,sans-serif" font-size="14" font-weight="600" fill="#8F3B3B">Kill</text>
+            <text x="470" y="134" font-family="Figtree,sans-serif" font-size="11" fill="#8A8275">key revoked at the gateway</text>
+          </g>
+          <g>
+            <rect x="452" y="162" width="184" height="48" rx="10" fill="{{ hero.b1.fill }}" stroke="{{ hero.b1.stroke }}" stroke-width="{{ hero.b1.sw }}"></rect>
+            <text x="470" y="183" font-family="Outfit,sans-serif" font-size="14" font-weight="600" fill="#17140F">Keep</text>
+            <text x="470" y="198" font-family="Figtree,sans-serif" font-size="11" fill="#8A8275">back on the desk next month</text>
+          </g>
+          <g>
+            <rect x="452" y="226" width="184" height="48" rx="10" fill="{{ hero.b2.fill }}" stroke="{{ hero.b2.stroke }}" stroke-width="{{ hero.b2.sw }}"></rect>
+            <text x="470" y="247" font-family="Outfit,sans-serif" font-size="14" font-weight="600" fill="#1B4FC4">Optimize</text>
+            <text x="470" y="262" font-family="Figtree,sans-serif" font-size="11" fill="#8A8275">cheaper model, same work</text>
+          </g>
+          <g>
+            <rect x="452" y="290" width="184" height="48" rx="10" fill="{{ hero.b3.fill }}" stroke="{{ hero.b3.stroke }}" stroke-width="{{ hero.b3.sw }}"></rect>
+            <text x="470" y="311" font-family="Outfit,sans-serif" font-size="14" font-weight="600" fill="#2F6B4F">Expand</text>
+            <text x="470" y="326" font-family="Figtree,sans-serif" font-size="11" fill="#8A8275">hand it more of the job</text>
+          </g>
+        </svg>
+        <div style="position:absolute;left:18%;bottom:0;width:min(300px,70%);background:#FFFDF7;border:1px solid #E7E3DA;border-radius:11px;padding:11px 14px;box-shadow:0 10px 24px -14px rgba(23,20,15,0.38)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="width:8px;height:8px;border-radius:50%;background:{{ hero.dot }};flex:none"></span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600">{{ hero.handle }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px">
+            <span style="font-size:12.5px;color:#5C564D">{{ hero.verdict }}</span>
+            <span style="display:inline-block;width:1.5px;height:12px;background:#1B4FC4;animation:caret 1s step-end infinite;flex:none"></span>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:clamp(34px,5vw,52px) clamp(20px,4vw,38px);border-top:1px solid #E7E3DA">
+    <div style="max-width:1220px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(24px,3vw,40px)">
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.012em">Every new model raises the bill</div>
+        <p style="margin:9px 0 0;color:#5C564D;font-size:16px;text-wrap:pretty">Hardly any of the work needed the expensive one, and nobody picking a model pays for it.</p>
+      </div>
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.012em">The case is written by the owner</div>
+        <p style="margin:9px 0 0;color:#5C564D;font-size:16px;text-wrap:pretty">Whoever asks for the budget also writes the number that wins it, and nobody opens it again.</p>
+      </div>
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.012em">So finance caps everyone</div>
+        <p style="margin:9px 0 0;color:#5C564D;font-size:16px;text-wrap:pretty">It is the last lever left when waste and wins look identical on an invoice.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pane" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px);background:#fff;border-top:1px solid #E7E3DA;border-bottom:1px solid #E7E3DA">
+    <div style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">ONE PANE</span>
+      </div>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:21ch;text-wrap:balance">Every agent in the company, on one page.</h2>
+      <p style="margin:0 0 26px;color:#5C564D;max-width:54ch;text-wrap:pretty">Every agent holding a key, and what it has cost you this month.</p>
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:#E7E3DA;border:1px solid #E7E3DA;border-radius:12px;overflow:hidden;margin-bottom:18px">
+        <div style="background:#fff;padding:17px 19px;">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">AI SPEND</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;margin-top:7px;color:#17140F">$26,190</div>
+          <div style="font-size:13.5px;color:#8A8275;margin-top:3px">seven agents, this month</div>
+        </div>
+        <div style="background:#fff;padding:17px 19px;">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">ON CLAIM</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;margin-top:7px;color:#2F6B4F">3</div>
+          <div style="font-size:13.5px;color:#8A8275;margin-top:3px">holding what they promised</div>
+        </div>
+        <div style="background:#fff;padding:17px 19px;">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">UNVERIFIED</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;margin-top:7px;color:#8A6A1F">2</div>
+          <div style="font-size:13.5px;color:#8A8275;margin-top:3px">no claim, or traffic too thin</div>
+        </div>
+        <div style="background:#fff;padding:17px 19px;box-shadow:inset 3px 0 0 #8F3B3B;">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8F3B3B">FLAGGED</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;margin-top:7px;color:#8F3B3B">2</div>
+          <div style="font-size:13.5px;color:#8A8275;margin-top:3px">$17,380 waiting on a call</div>
+        </div>
+      </section>
+      <div style="border:1px solid #E7E3DA;border-radius:12px;background:#fff;overflow-x:auto">
+        <div style="min-width:720px">
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:12px 20px;border-bottom:1px solid #E7E3DA;font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">
+            <div>AGENT</div><div>TEAM</div><div>MODEL</div><div style="text-align:right">SPEND</div><div>STATUS</div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:15px 20px;border-bottom:1px solid #EFECE5;">
+            <div style="font-weight:600;font-size:15px">Contract Redliner</div>
+            <div style="color:#5C564D;font-size:15px">Legal</div>
+            <div style="color:#5C564D;font-size:15px">Optimized</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:15px">$4,120</div>
+            <div><span style="display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid #CFE0D6;background:#E9F2EB;color:#2F6B4F;font-size:12px;font-weight:600">On claim</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:15px 20px;border-bottom:1px solid #EFECE5;box-shadow:inset 3px 0 0 #8F3B3B;">
+            <div style="font-weight:600;font-size:15px">Invoice Triage</div>
+            <div style="color:#5C564D;font-size:15px">Finance Ops</div>
+            <div style="color:#5C564D;font-size:15px">Frontier</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:15px">$9,480</div>
+            <div><span style="display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid #EDD6CF;background:#FAEDE9;color:#8F3B3B;font-size:12px;font-weight:600">Flagged</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:15px 20px;border-bottom:1px solid #EFECE5;">
+            <div style="font-weight:600;font-size:15px">Support Draft Assistant</div>
+            <div style="color:#5C564D;font-size:15px">Support</div>
+            <div style="color:#5C564D;font-size:15px">Optimized</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:15px">$2,340</div>
+            <div><span style="display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid #CFE0D6;background:#E9F2EB;color:#2F6B4F;font-size:12px;font-weight:600">On claim</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:15px 20px;border-bottom:1px solid #EFECE5;box-shadow:inset 3px 0 0 #8F3B3B;">
+            <div style="font-weight:600;font-size:15px">Security Log Reviewer</div>
+            <div style="color:#5C564D;font-size:15px">IT Security</div>
+            <div style="color:#5C564D;font-size:15px">Frontier</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:15px">$7,900</div>
+            <div><span style="display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid #EDD6CF;background:#FAEDE9;color:#8F3B3B;font-size:12px;font-weight:600">Flagged</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:15px 20px;border-bottom:1px solid #EFECE5;">
+            <div style="font-weight:600;font-size:15px">Sales Call Summarizer</div>
+            <div style="color:#5C564D;font-size:15px">Revenue</div>
+            <div style="color:#5C564D;font-size:15px">Economy</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:15px">$760</div>
+            <div><span style="display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid #E8DCBD;background:#FBF3E0;color:#8A6A1F;font-size:12px;font-weight:600">Unverified</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:15px 20px;border-bottom:1px solid #EFECE5;">
+            <div style="font-weight:600;font-size:15px">Recruiting Screener</div>
+            <div style="color:#5C564D;font-size:15px">People</div>
+            <div style="color:#5C564D;font-size:15px">Optimized</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:15px">$1,180</div>
+            <div><span style="display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid #E8DCBD;background:#FBF3E0;color:#8A6A1F;font-size:12px;font-weight:600">Unverified</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1.1fr 0.9fr 0.8fr 1fr;gap:16px;align-items:center;padding:15px 20px;">
+            <div style="font-weight:600;font-size:15px">Data Migration Bot</div>
+            <div style="color:#5C564D;font-size:15px">Data Platform</div>
+            <div style="color:#5C564D;font-size:15px">Economy</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;font-size:15px">$410</div>
+            <div><span style="display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid #CFE0D6;background:#E9F2EB;color:#2F6B4F;font-size:12px;font-weight:600">On claim</span></div>
+          </div>
+        </div>
+      </div>
+      <p style="margin:16px 2px 0;color:#5C564D;max-width:58ch;text-wrap:pretty">Shadow AI stops being shadow the moment a key is the only way to reach a model.</p>
+    </div>
+  </section>
+  <section id="gap" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px)">
+    <div style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">WHERE WE SIT</span>
+      </div>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:20ch;text-wrap:balance">There is a hole between your agents and the bill.</h2>
+      <p style="margin:0 0 26px;color:#5C564D;max-width:56ch;text-wrap:pretty">One key, one gateway. Watch what changes when something is standing in the path.</p>
+
+      <div style="background:#E8F0FB;border-radius:18px;padding:clamp(22px,3.5vw,32px)">
+        <div style="display:flex;gap:8px;margin-bottom:24px">
+          <button onClick="{{ slot.showToday }}" style="{{ slot.todayChip }}" style-focus="outline:2px solid #1B4FC4;outline-offset:2px">Today</button>
+          <button onClick="{{ slot.showLedger }}" style="{{ slot.ledgerChip }}" style-focus="outline:2px solid #1B4FC4;outline-offset:2px">With Ledger</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;align-items:center">
+          <div style="background:#fff;border-radius:12px;padding:17px 19px">
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">YOUR AGENTS</div>
+            <div style="margin-top:11px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:14.5px;color:#17140F">Invoice Triage</div>
+              <div style="font-size:14.5px;color:#17140F">Support Drafts</div>
+              <div style="font-size:14.5px;color:#17140F">Log Reviewer</div>
+              <div style="font-size:13.5px;color:#8A8275">and eleven more</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:center;min-height:132px">
+            <sc-if value="{{ slot.empty }}" hint-placeholder-val="{{ true }}">
+              <div style="width:100%;border:2px dashed #B9C7E0;border-radius:12px;padding:26px 14px;text-align:center">
+                <div style="font-size:14px;color:#6F7E97;text-wrap:pretty">Nothing here. The calls just leave.</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ slot.filled }}" hint-placeholder-val="{{ false }}">
+              <div style="width:100%;background:#1B4FC4;border-radius:12px;padding:22px 14px;text-align:center;animation:gateDrop 0.5s cubic-bezier(0.34,1.2,0.64,1) both">
+                <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:#fff">Ledger</div>
+                <div style="font-size:12.5px;color:#BDCDEE;margin-top:3px">reads every call</div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ slot.rows }}" as="sr" hint-placeholder-count="3">
+              <div style="background:#fff;border-radius:12px;padding:14px 16px">
+                <div style="font-size:14.5px;font-weight:600;color:#17140F">{{ sr.name }}</div>
+                <span style="{{ sr.pillStyle }}">{{ sr.pill }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <p style="margin:22px 0 0;font-size:14.5px;color:#55637C;text-wrap:pretty">{{ slot.caption }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="leak" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px)">
+    <div style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">THE LEAK</span>
+      </div>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:21ch;text-wrap:balance">Most of the bill is a frontier model doing easy work.</h2>
+      <p style="margin:0 0 26px;color:#5C564D;max-width:54ch;text-wrap:pretty">Pick a task. Drag the volume to yours.</p>
+
+      <div style="background:#FBF3E0;border-radius:18px;padding:clamp(22px,3.5vw,32px)">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A7B5E;margin-bottom:11px">THE TASK</div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <sc-for list="{{ tasks }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.pick }}" style="{{ t.chip }}" style-focus="outline:2px solid #1B4FC4;outline-offset:2px">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:26px 0 2px">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A7B5E">RUNS A MONTH</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:500;color:#1B4FC4">{{ leak.runsLabel }}</div>
+        </div>
+        <input type="range" min="0" max="7" step="1" value="{{ leak.idx }}" onChange="{{ setRuns }}" aria-label="Runs a month" />
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:22px">
+          <div>
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A7B5E">WHAT YOU PAY TODAY</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(28px,4vw,36px);font-weight:500;margin-top:7px;color:#17140F">{{ leak.youCost }}</div>
+            <div style="font-size:15px;color:#6B6252;margin-top:5px;text-wrap:pretty">{{ leak.youLine }}</div>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#1B4FC4">WHAT THE WORK NEEDS</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(28px,4vw,36px);font-weight:600;margin-top:7px;color:#1B4FC4">{{ leak.needCost }}</div>
+            <div style="font-size:15px;color:#6B6252;margin-top:5px;text-wrap:pretty">{{ leak.needLine }}</div>
+          </div>
+        </div>
+
+        <div style="margin-top:22px;padding-top:20px;border-top:1px solid #E8DCBD">
+          <div style="position:relative;height:11px;border-radius:999px;background:#EFE2C4;overflow:hidden">
+            <div style="height:11px;border-radius:999px;width:{{ leak.fillW }};background:#1B4FC4"></div>
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-top:12px">
+            <div style="font-size:15px;color:#6B6252">Blue is the work. The rest is a tier nobody chose on purpose.</div>
+            <div style="display:flex;align-items:baseline;gap:9px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:#8F3B3B">{{ leak.saving }}</span>
+              <span style="font-size:15px;color:#6B6252">sitting in the gap</span>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin:20px 0 0;color:#4F483B;text-wrap:pretty">{{ leak.why }}</p>
+      </div>
+      <p style="margin:13px 2px 0;font-size:14px;color:#8A8275;text-wrap:pretty">Sample rates, drawn from the kind of traffic we read. Yours land in the first week.</p>
+    </div>
+  </section>
+
+  <section id="read" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px);background:#fff;border-top:1px solid #E7E3DA;border-bottom:1px solid #E7E3DA">
+    <div style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">THE READ</span>
+      </div>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:22ch;text-wrap:balance">The owner names a number. We go and check it.</h2>
+      <p style="margin:0 0 24px;color:#5C564D;max-width:56ch;text-wrap:pretty">The real screen. Pick an agent and watch the two figures separate.</p>
+
+      <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px">
+        <sc-for list="{{ agents }}" as="g" hint-placeholder-count="3">
+          <button onClick="{{ g.pick }}" style="{{ g.chip }}" style-focus="outline:2px solid #1B4FC4;outline-offset:2px">{{ g.name }}</button>
+        </sc-for>
+      </div>
+
+      <div style="border:1px solid #E7E3DA;border-radius:16px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:8px;padding:11px 18px;background:#F4F2ED;border-bottom:1px solid #E7E3DA">
+          <span style="width:9px;height:9px;border-radius:50%;background:#DCD6CA"></span>
+          <span style="width:9px;height:9px;border-radius:50%;background:#DCD6CA"></span>
+          <span style="width:9px;height:9px;border-radius:50%;background:#DCD6CA"></span>
+          <span style="margin-left:9px;font-size:12.5px;color:#8A8275">Ledger · {{ read.name }}</span>
+        </div>
+        <div style="padding:clamp(20px,3.5vw,28px)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap">
+            <div>
+              <div style="font-family:'Outfit',sans-serif;font-size:21px;font-weight:600;letter-spacing:-0.015em">{{ read.name }}</div>
+              <div style="font-size:14.5px;color:#8A8275;margin-top:2px">{{ read.who }}</div>
+            </div>
+            <span style="{{ read.pill }}">{{ read.status }}</span>
+          </div>
+
+          <div style="margin-top:16px;font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;color:{{ read.verdictColor }}">{{ read.verdict }}</div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1px;background:#E7E3DA;border:1px solid #E7E3DA;border-radius:12px;overflow:hidden;margin-top:18px">
+            <div style="background:#fff;padding:17px 19px">
+              <div style="display:flex;align-items:center;gap:7px">
+                <span style="width:7px;height:7px;border-radius:2px;background:#C9C2B5"></span>
+                <span style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">WHAT THE OWNER CLAIMED</span>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:500;margin-top:8px">{{ read.claim }}</div>
+              <div style="font-size:14px;color:#8A8275;margin-top:5px;text-wrap:pretty">{{ read.claimNote }}</div>
+            </div>
+            <div style="background:#fff;padding:17px 19px">
+              <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">WHAT IT SPENT</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:500;margin-top:8px">{{ read.spend }}</div>
+              <div style="font-size:14px;color:#8A8275;margin-top:5px;text-wrap:pretty">{{ read.spendNote }}</div>
+            </div>
+            <div style="background:#fff;padding:17px 19px;box-shadow:inset 3px 0 0 #1B4FC4">
+              <div style="display:flex;align-items:center;gap:7px">
+                <span style="width:7px;height:7px;border-radius:2px;background:#1B4FC4"></span>
+                <span style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#1B4FC4">WHAT THE WORK PROVES</span>
+              </div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;color:#1B4FC4;margin-top:8px">{{ read.actual }}</div>
+              <div style="display:inline-block;margin-top:6px;padding:2px 9px;border-radius:5px;background:{{ read.deltaBg }};color:{{ read.deltaFg }};font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500">{{ read.delta }}</div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px">
+            <div style="position:relative;height:9px;border-radius:999px;background:#EFECE5">
+              <div style="height:9px;border-radius:999px;width:{{ read.fillW }};background:{{ read.fillColor }}"></div>
+              <div style="position:absolute;top:-5px;left:{{ read.tickL }};width:2px;height:19px;background:#17140F"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:12px;margin-top:9px;font-size:13.5px;color:#8A8275">
+              <span>Tick is the claim</span>
+              <span style="color:{{ read.fillColor }}">Fill is our read</span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin-top:20px">
+            <sc-for list="{{ read.flags }}" as="rf" hint-placeholder-count="3">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:7px;border-bottom:1px solid #E7E3DA">
+                  <div style="font-weight:600;font-size:14.5px">{{ rf.title }}</div>
+                  <span style="{{ rf.markStyle }}">{{ rf.mark }}</span>
+                </div>
+                <div style="font-size:14px;color:#5C564D;margin-top:9px;text-wrap:pretty">{{ rf.body }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid #E7E3DA">
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">CONFIDENCE IN THIS READ</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:{{ read.gradeColor }}">{{ read.grade }}</div>
+            <div style="font-size:15px;color:#5C564D;flex:1;min-width:230px;text-wrap:pretty">{{ read.gradeNote }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:14px;margin-top:18px;padding:17px 20px;background:#F4F2ED;border-radius:12px">
+        <div style="font-size:13.5px;font-weight:600;color:#8A6A1F;white-space:nowrap">Where we stop</div>
+        <div style="font-size:15px;color:#4F483B;text-wrap:pretty">We read the agent, never the person beside it. Marco's eight minutes an invoice stays marked claimed, unverified until the work backs it up.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="call" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px)">
+    <div style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">THE CALL</span>
+      </div>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:20ch;text-wrap:balance">Every flag ends in one of four decisions.</h2>
+      <p style="margin:0 0 26px;color:#5C564D;max-width:56ch;text-wrap:pretty">The owner answers first, then you choose. Kill and Optimize take effect at the gateway, not in an email.</p>
+
+      <div style="background:#E9F2EB;border-radius:18px;padding:clamp(22px,3.5vw,32px)">
+        <div style="{{ callCardStyle }}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap">
+            <div>
+              <div style="font-family:'Outfit',sans-serif;font-size:21px;font-weight:600;letter-spacing:-0.015em">Invoice Triage</div>
+              <div style="font-size:14.5px;color:#8A8275;margin-top:2px">Marco Reyes · Finance Ops · {{ call.tier }} tier</div>
+            </div>
+            <span style="{{ call.pill }}">{{ call.status }}</span>
+          </div>
+
+          <div style="display:flex;gap:28px;flex-wrap:wrap;margin-top:18px;padding:16px 0;border-top:1px solid #E7E3DA;border-bottom:1px solid #E7E3DA">
+            <div>
+              <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">SPEND</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;margin-top:3px">$9,480</div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">CLAIM</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;margin-top:3px">$28,000</div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">OUR READ</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;margin-top:3px;color:#1B4FC4">$5,040</div>
+            </div>
+            <div>
+              <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">CONFIDENCE</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;margin-top:3px">B</div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;padding:15px 17px;border-radius:10px;background:#F4F2ED">
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">MARCO ANSWERED ON TUESDAY</div>
+            <div style="margin-top:8px;padding-left:13px;border-left:2px solid #D3CCC0;color:#4F483B;text-wrap:pretty">The ERP overlap is real and I knew about it. I built this for the 18% the ERP cannot code, then never split the traffic, so it runs on everything.</div>
+          </div>
+
+          <sc-if value="{{ call.open }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:11px;margin-top:20px">
+              <button onClick="{{ call.onKill }}" style="padding:14px 16px;border:1px solid #E7E3DA;border-radius:10px;background:#fff;color:#8F3B3B;font-weight:600;cursor:pointer" style-hover="background:#FAEDE9;border-color:#8F3B3B" style-focus="outline:2px solid #8F3B3B;outline-offset:2px">Kill</button>
+              <button onClick="{{ call.onKeep }}" style="padding:14px 16px;border:1px solid #E7E3DA;border-radius:10px;background:#fff;font-weight:600;cursor:pointer" style-hover="background:#F4F2ED;border-color:#C9C2B5" style-focus="outline:2px solid #1B4FC4;outline-offset:2px">Keep</button>
+              <button onClick="{{ call.onOptimize }}" style="padding:14px 16px;border:0;border-radius:10px;background:#1B4FC4;color:#fff;font-weight:600;cursor:pointer" style-hover="background:#143a92" style-focus="outline:2px solid #17140F;outline-offset:2px">Optimize</button>
+              <button onClick="{{ call.onExpand }}" style="padding:14px 16px;border:1px solid #E7E3DA;border-radius:10px;background:#fff;font-weight:600;cursor:pointer" style-hover="background:#F4F2ED;border-color:#C9C2B5" style-focus="outline:2px solid #1B4FC4;outline-offset:2px">Expand</button>
+            </div>
+            <div style="margin-top:11px;font-size:14px;color:#8A8275;text-wrap:pretty">Kill and Optimize happen at the gateway. Keep and Expand go on the record against the claim.</div>
+          </sc-if>
+
+          <sc-if value="{{ call.settled }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:20px;padding:18px 20px;border-radius:11px;background:{{ call.edgeBg }};box-shadow:inset 3px 0 0 {{ call.edge }};animation:cardIn 0.26s ease-out both">
+              <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:{{ call.edge }}">{{ call.verb }} on Tuesday</div>
+              <div style="margin-top:6px;color:#4F483B;max-width:60ch;text-wrap:pretty">{{ call.line }}</div>
+              <div style="display:flex;align-items:baseline;gap:10px;margin-top:12px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:{{ call.edge }}">{{ call.saved }}</span>
+                <span style="font-size:15px;color:#6B6252">{{ call.savedNote }}</span>
+              </div>
+            </div>
+            <button onClick="{{ call.onReset }}" style="margin-top:16px;padding:12px 20px;border:1px solid #E7E3DA;border-radius:9px;background:#fff;font-weight:600;cursor:pointer" style-hover="background:#F4F2ED" style-focus="outline:2px solid #1B4FC4;outline-offset:2px">Run it again</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="trust" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px);background:#F4F2ED;border-top:1px solid #E7E3DA">
+    <div style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">WHAT WE KEEP</span>
+      </div>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:20ch;text-wrap:balance">We read the call. We don&#39;t keep it.</h2>
+      <p style="margin:0 0 26px;color:#5C564D;max-width:56ch;text-wrap:pretty">Grading runs in memory while the request is in flight. The prompt and the completion are gone by the time the response reaches your agent.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+        <div style="background:#fff;border-radius:14px;padding:22px 24px">
+          <div style="display:flex;align-items:center;gap:8px;padding-bottom:13px;border-bottom:1px solid #E7E3DA">
+            <span style="width:9px;height:9px;border-radius:3px;background:#2F6B4F"></span>
+            <span style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Kept</span>
+          </div>
+          <div style="padding:11px 0;border-bottom:1px solid #EFECE5;color:#4F483B;font-size:15.5px;text-wrap:pretty">Token counts, latency, and the model that actually answered</div>
+          <div style="padding:11px 0;border-bottom:1px solid #EFECE5;color:#4F483B;font-size:15.5px;text-wrap:pretty">The grade, and the one line of evidence standing behind it</div>
+          <div style="padding:11px 0;border-bottom:1px solid #EFECE5;color:#4F483B;font-size:15.5px;text-wrap:pretty">Who owns the agent and what they claimed it was worth</div>
+          <div style="padding:11px 0;border-bottom:1px solid #EFECE5;color:#4F483B;font-size:15.5px;text-wrap:pretty">Every decision, and the name of whoever made it</div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:22px 24px">
+          <div style="display:flex;align-items:center;gap:8px;padding-bottom:13px;border-bottom:1px solid #E7E3DA">
+            <span style="width:9px;height:9px;border-radius:3px;background:#8F3B3B"></span>
+            <span style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Dropped</span>
+          </div>
+          <div style="padding:11px 0;border-bottom:1px solid #EFECE5;color:#4F483B;font-size:15.5px;text-wrap:pretty">The prompt, including whatever context files rode along with it</div>
+          <div style="padding:11px 0;border-bottom:1px solid #EFECE5;color:#4F483B;font-size:15.5px;text-wrap:pretty">The completion, in full</div>
+          <div style="padding:11px 0;border-bottom:1px solid #EFECE5;color:#4F483B;font-size:15.5px;text-wrap:pretty">Anything your own redaction rules catch on the way in</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:16px">
+        <div style="background:#fff;border-radius:14px;padding:20px 24px">
+          <div style="font-weight:600;margin-bottom:5px">Want it tighter?</div>
+          <div style="color:#5C564D;font-size:15.5px;text-wrap:pretty">Run the gateway inside your own VPC. Nothing crosses your network boundary and the readings come out the same.</div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:20px 24px">
+          <div style="font-weight:600;margin-bottom:5px">Cost routing ships switched off.</div>
+          <div style="color:#5C564D;font-size:15.5px;text-wrap:pretty">We read every call and grade it. We move nothing until you hand us the wheel, one agent at a time.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:clamp(44px,6vw,66px) clamp(20px,4vw,38px);background:#fff;border-top:1px solid #E7E3DA">
+    <div style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:22px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">ENDORSED BY</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px">
+        <div style="background:#E8F0FB;border-radius:16px;padding:24px 26px;display:flex;flex-direction:column">
+          <svg width="22" height="18" viewBox="0 0 22 18" fill="none" aria-hidden="true" style="margin-bottom:14px">
+            <path d="M8.4 0C3.9 1.9 0.9 6 0.9 10.6c0 4.2 2.4 6.9 5.6 6.9 2.7 0 4.7-2 4.7-4.6 0-2.5-1.8-4.4-4.2-4.4-0.5 0-1 0.1-1.2 0.2 0.5-2.2 2.5-4.5 4.8-5.7L8.4 0Zm11 0c-4.5 1.9-7.5 6-7.5 10.6 0 4.2 2.4 6.9 5.6 6.9 2.7 0 4.7-2 4.7-4.6 0-2.5-1.8-4.4-4.2-4.4-0.5 0-1 0.1-1.2 0.2 0.5-2.2 2.5-4.5 4.8-5.7L19.4 0Z" fill="#17140F" opacity="0.18"></path>
+          </svg>
+          <div style="font-size:17px;line-height:1.5;color:#17140F;text-wrap:pretty;flex:1">[QUOTE FROM NIS TRAINING — one or two sentences, with a figure in it if you can get one]</div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid #CBDBF4">
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-0.012em">NIS Training</div>
+            <div style="font-size:14px;color:#8A8275;margin-top:2px">[NAME], [ROLE]</div>
+          </div>
+        </div>
+        <div style="background:#FBF3E0;border-radius:16px;padding:24px 26px;display:flex;flex-direction:column">
+          <svg width="22" height="18" viewBox="0 0 22 18" fill="none" aria-hidden="true" style="margin-bottom:14px">
+            <path d="M8.4 0C3.9 1.9 0.9 6 0.9 10.6c0 4.2 2.4 6.9 5.6 6.9 2.7 0 4.7-2 4.7-4.6 0-2.5-1.8-4.4-4.2-4.4-0.5 0-1 0.1-1.2 0.2 0.5-2.2 2.5-4.5 4.8-5.7L8.4 0Zm11 0c-4.5 1.9-7.5 6-7.5 10.6 0 4.2 2.4 6.9 5.6 6.9 2.7 0 4.7-2 4.7-4.6 0-2.5-1.8-4.4-4.2-4.4-0.5 0-1 0.1-1.2 0.2 0.5-2.2 2.5-4.5 4.8-5.7L19.4 0Z" fill="#17140F" opacity="0.18"></path>
+          </svg>
+          <div style="font-size:17px;line-height:1.5;color:#17140F;text-wrap:pretty;flex:1">[QUOTE FROM WALLETCARD — one or two sentences, with a figure in it if you can get one]</div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid #E8DCBD">
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-0.012em">Walletcard</div>
+            <div style="font-size:14px;color:#8A8275;margin-top:2px">[NAME], [ROLE]</div>
+          </div>
+        </div>
+        <div style="background:#E9F2EB;border-radius:16px;padding:24px 26px;display:flex;flex-direction:column">
+          <svg width="22" height="18" viewBox="0 0 22 18" fill="none" aria-hidden="true" style="margin-bottom:14px">
+            <path d="M8.4 0C3.9 1.9 0.9 6 0.9 10.6c0 4.2 2.4 6.9 5.6 6.9 2.7 0 4.7-2 4.7-4.6 0-2.5-1.8-4.4-4.2-4.4-0.5 0-1 0.1-1.2 0.2 0.5-2.2 2.5-4.5 4.8-5.7L8.4 0Zm11 0c-4.5 1.9-7.5 6-7.5 10.6 0 4.2 2.4 6.9 5.6 6.9 2.7 0 4.7-2 4.7-4.6 0-2.5-1.8-4.4-4.2-4.4-0.5 0-1 0.1-1.2 0.2 0.5-2.2 2.5-4.5 4.8-5.7L19.4 0Z" fill="#17140F" opacity="0.18"></path>
+          </svg>
+          <div style="font-size:17px;line-height:1.5;color:#17140F;text-wrap:pretty;flex:1">[QUOTE FROM PHISHPLEASE — one or two sentences, with a figure in it if you can get one]</div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid #CFE0D6">
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;letter-spacing:-0.012em">PhishPlease</div>
+            <div style="font-size:14px;color:#8A8275;margin-top:2px">[NAME], [ROLE]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="walkthrough" style="background:#17140F;color:#FBFAF7;padding:clamp(60px,8vw,96px) clamp(20px,4vw,38px)">
+    <div style="max-width:660px;margin:0 auto;text-align:center">
+      <h2 style="margin:0 0 14px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.8vw,42px);font-weight:600;letter-spacing:-0.03em;line-height:1.1;text-wrap:balance">Every agent earns its place, or it doesn't.</h2>
+      <p style="margin:0 auto 30px;color:#B3ABA0;max-width:44ch;text-wrap:pretty">Put one agent behind the gateway. A week later you have a number for it, and a grade saying how much to trust that number.</p>
+      <a href="[YOUR BOOKING LINK]" style="display:inline-block;padding:16px 30px;border-radius:9px;background:#FBFAF7;color:#17140F;font-weight:600;font-size:17px" style-hover="background:#fff;text-decoration:none">Book a walkthrough</a>
+      <p style="margin:22px 0 0;font-size:14.5px;color:#8A8275">Or write to [YOUR EMAIL].</p>
+    </div>
+  </section>
+
+  <footer style="padding:24px clamp(20px,4vw,38px)">
+    <div style="max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:17px;letter-spacing:-0.025em">Ledger</span>
+      <span style="font-size:14px;color:#8A8275">[YOUR COMPANY], [YEAR]</span>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+const usd = n => '$' + Math.round(n).toLocaleString('en-US');
+
+const TONE = {
+  pass: { fg: '#2F6B4F', bg: '#E9F2EB', bd: '#CFE0D6' },
+  warn: { fg: '#8A6A1F', bg: '#FBF3E0', bd: '#E8DCBD' },
+  fail: { fg: '#8F3B3B', bg: '#FAEDE9', bd: '#EDD6CF' },
+  flat: { fg: '#5C564D', bg: '#F4F2ED', bd: '#E7E3DA' },
+  blue: { fg: '#1B4FC4', bg: '#E8F0FB', bd: '#CBDBF4' }
+};
+
+const pill = t => 'display:inline-block;padding:4px 12px;border-radius:999px;border:1px solid ' + t.bd +
+  ';background:' + t.bg + ';color:' + t.fg + ';font-size:12.5px;font-weight:600';
+
+const mark = t => 'padding:2px 9px;border-radius:5px;background:' + t.bg + ';color:' + t.fg +
+  ';font-size:11.5px;font-weight:600';
+
+/* ---------- hero scene ---------- */
+
+const BAYS = [
+  { label: 'Kill',     note: 'key revoked at the gateway', fill: '#FAEDE9', ink: '#8F3B3B' },
+  { label: 'Keep',     note: 'back on the desk next month', fill: '#F4F2ED', ink: '#17140F' },
+  { label: 'Optimize', note: 'cheaper model, same work',    fill: '#E8F0FB', ink: '#1B4FC4' },
+  { label: 'Expand',   note: 'hand it more of the job',     fill: '#E9F2EB', ink: '#2F6B4F' }
+];
+
+const CAST = [
+  { name: 'Invoice Triage',     team: 'Finance Ops',   tint: '#E8F0FB', glyph: '#1B4FC4', bay: 2,
+    handle: '@invoice-triage',     verdict: '18% of claim, so route it cheaper' },
+  { name: 'Support Drafts',     team: 'Support',       tint: '#E9F2EB', glyph: '#2F6B4F', bay: 1,
+    handle: '@support-drafts',     verdict: '116% of claim. Leave it alone' },
+  { name: 'Log Reviewer',       team: 'IT Security',   tint: '#FBF3E0', glyph: '#8A6A1F', bay: 2,
+    handle: '@log-reviewer',       verdict: 'Frontier nine nights in ten to find nothing' },
+  { name: 'Recruiting Screener',team: 'People',        tint: '#FAEDE9', glyph: '#8F3B3B', bay: 0,
+    handle: '@recruiting-screener',verdict: 'No claim on file. Tom was asked twice' },
+  { name: 'Migration Bot',      team: 'Data Platform', tint: '#E9F2EB', glyph: '#2F6B4F', bay: 3,
+    handle: '@migration-bot',      verdict: '112% of claim at three cents a run' }
+];
+
+const TILE_Y = [70, 132, 194, 256, 318];
+const BAY_Y  = [98, 162, 226, 290];
+
+/* ---------- demo 1 ---------- */
+
+const STEPS = [250, 500, 1000, 2500, 5000, 10000, 25000, 50000];
+
+const TASKS = [
+  { label: 'Extract fields from an invoice', you: 2.42, need: 0.53,
+    youLine: 'Frontier, every run.',
+    needLine: 'Economy for the 82% that are plain extraction. Frontier keeps the rest.',
+    why: 'Four calls in five restate what the ERP already parsed. A frontier model reads those fields from scratch; a cheap one confirms them for a fraction of the price.' },
+  { label: 'Draft a support reply', you: 0.38, need: 0.31,
+    youLine: 'Optimized, escalating on the longest threads.',
+    needLine: 'Stays where it is. Caching the account lookup across a thread is the whole saving.',
+    why: 'Economy drafts came back rejected twice as often, so this one already sits near its floor. Not every agent is a leak, and we say so.' },
+  { label: 'Summarise a sales call', you: 0.74, need: 0.09,
+    youLine: 'Optimized, every run.',
+    needLine: 'Economy, every run.',
+    why: 'A transcript goes in and a short summary comes out. Twelve in a hundred were ever opened, which is its own problem, but not one the expensive model solves.' },
+  { label: 'Review a vendor contract', you: 4.80, need: 2.60,
+    youLine: 'Frontier, whatever the length.',
+    needLine: 'Short agreements drop to Optimized. Ninety-page ones keep Frontier.',
+    why: 'A four-page NDA gets the same tier as a master agreement twenty times its length. Length is the only thing that should be picking the model here.' }
+];
+
+/* ---------- demo 2 ---------- */
+
+const AGENTS = [
+  { name: 'Invoice Triage', who: 'Marco Reyes · Finance Ops · Frontier tier', status: 'Flagged', tone: 'fail',
+    claim: 28000, spend: 9480, actual: 5040, grade: 'B',
+    claimNote: 'Eight minutes an invoice, 3,500 a month.',
+    spendNote: '$2.42 a call, across 3,910 calls.',
+    gradeNote: 'Seven months of traffic, plus every GL code AP quietly changed afterwards. A week of split traffic takes this to A.',
+    flags: [
+      { title: 'Execution', mark: 'Warn', state: 'warn', body: 'It runs on everything, but 82% of calls echo fields the ERP already had.' },
+      { title: 'Output quality', mark: 'Fail', state: 'fail', body: 'On the invoices that need judgment, AP changed the GL code 31% of the time.' },
+      { title: 'Spend line', mark: 'Fail', state: 'fail', body: 'Frontier tier on extraction work. Economy matches it.' }
+    ] },
+  { name: 'Support Draft Assistant', who: 'Priya Raman · Support · Optimized tier', status: 'Tracking', tone: 'pass',
+    claim: 9000, spend: 2340, actual: 10400, grade: 'A',
+    claimNote: 'Four minutes a ticket, 6,000 tickets a month.',
+    spendNote: '6,120 runs. Thirty-eight cents each.',
+    gradeNote: 'Six thousand runs a month, with a send-or-rewrite signal we can read on every one.',
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', body: 'Pulls the thread and the account record on every run.' },
+      { title: 'Output quality', mark: 'Pass', state: 'pass', body: '71% of drafts go out with minor edits. Escalations held flat.' },
+      { title: 'Spend line', mark: 'Pass', state: 'pass', body: 'Economy drafts were rejected twice as often. This is the right floor.' }
+    ] },
+  { name: 'Security Log Reviewer', who: 'Lena Fischer · IT Security · Frontier tier', status: 'Flagged', tone: 'fail',
+    claim: 15000, spend: 7900, actual: 3600, grade: 'B−',
+    claimNote: 'Two and a half analyst hours a night, at a $92 loaded rate.',
+    spendNote: '540 runs. Fourteen dollars and change every night.',
+    gradeNote: 'Five hundred and forty nights, checked against the same queue the analyst worked. Nine in ten come back empty, so the sample that matters stays thin.',
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', body: 'Reads the full overnight window every run.' },
+      { title: 'Output quality', mark: 'Warn', state: 'warn', body: 'Caught everything the analyst caught, plus 4.2 false alarms a night.' },
+      { title: 'Spend line', mark: 'Fail', state: 'fail', body: '180k tokens of routine log lines through Frontier to find nothing.' }
+    ] }
+];
+
+/* ---------- demo 3 ---------- */
+
+const CALLS = {
+  Kill: { verb: 'Killed', status: 'Revoked', tone: 'flat', tier: 'Frontier', edge: '#8F3B3B', bg: '#FAEDE9', saved: '$9,480',
+    savedNote: 'off the run rate, starting today',
+    line: 'Key revoked at the gateway. Invoice Triage cannot reach a model as of now, and Marco has the notice.' },
+  Keep: { verb: 'Kept', status: 'Flagged', tone: 'fail', tier: 'Frontier', edge: '#5C564D', bg: '#F4F2ED', saved: '$0',
+    savedNote: 'off the run rate. You chose the spend with your eyes open.',
+    line: 'Kept on Frontier, spend and all. It lands back on the decisions page in thirty days, so it cannot quietly become a graveyard.' },
+  Optimize: { verb: 'Optimized', status: 'Flagged', tone: 'fail', tier: 'Optimized', edge: '#1B4FC4', bg: '#E8F0FB', saved: '$6,900',
+    savedNote: 'off the run rate, rerouted by us',
+    line: 'Extraction moved to Economy. The 18% that need judgment stay on Frontier, and the claim reading did not move with it.' },
+  Expand: { verb: 'Expanded', status: 'Flagged', tone: 'fail', tier: 'Frontier', edge: '#2F6B4F', bg: '#E9F2EB', saved: '$0',
+    savedNote: 'off the run rate. This one is a bet, not a saving.',
+    line: 'Ceiling lifted. More invoices route here and the claim stays on the books, still reading 18% of claim.' }
+};
+
+/* ---------- the empty slot ---------- */
+
+const SLOT = {
+  today: {
+    caption: 'Three model vendors, one invoice at the end of the month, and nothing on it says whose agent spent what.',
+    rows: [
+      { name: 'Anthropic', pill: 'No owner', tone: 'warn' },
+      { name: 'OpenAI', pill: 'No claim on file', tone: 'warn' },
+      { name: 'Google', pill: 'Spend unread', tone: 'warn' }
+    ] },
+  ledger: {
+    caption: 'Same traffic, same vendors. Every call now carries an owner and a number it has to answer to.',
+    rows: [
+      { name: 'Anthropic', pill: 'Owner: Dana Whitfield', tone: 'pass' },
+      { name: 'OpenAI', pill: '93% of claim', tone: 'pass' },
+      { name: 'Google', pill: 'Routed to Economy', tone: 'blue' }
+    ] }
+};
+
+class Component extends DCLogic {
+  state = { task: 0, runs: 4, agent: 0, call: null, slot: 'today', step: 0 };
+
+  componentDidMount() {
+    this._t = setInterval(() => this.setState(s => ({ step: (s.step + 1) % CAST.length })), 3800);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  chip(active) {
+    return 'padding:11px 17px;border-radius:999px;cursor:pointer;font-size:14.5px;font-weight:500;border:1px solid ' +
+      (active ? '#17140F' : '#E7E3DA') + ';background:' + (active ? '#17140F' : '#FFFFFF') +
+      ';color:' + (active ? '#FBFAF7' : '#5C564D');
+  }
+
+  tab(active) {
+    return 'padding:10px 18px;border-radius:9px;cursor:pointer;font-size:14.5px;font-weight:600;border:1px solid ' +
+      (active ? '#1B4FC4' : '#CBDBF4') + ';background:' + (active ? '#1B4FC4' : 'transparent') +
+      ';color:' + (active ? '#FFFFFF' : '#2F4A7A') + ';';
+  }
+
+  gradeColor(g) {
+    const c = g.charAt(0);
+    return c === 'A' ? '#2F6B4F' : c === 'B' ? '#1B4FC4' : '#8A6A1F';
+  }
+
+  renderVals() {
+    const st = this.state;
+
+    /* hero */
+    const active = CAST[st.step];
+    const hero = {
+      links: CAST.map((c, i) => ({
+        d: 'M172,' + (TILE_Y[i] + 24) + ' C210,' + (TILE_Y[i] + 24) + ' 220,218 258,218',
+        anim: 'animation:flow 2.6s linear infinite;animation-delay:-' + (i * 0.42).toFixed(2) + 's'
+      })),
+      outs: BAYS.map((b, i) => ({
+        d: 'M370,218 C405,218 415,' + (BAY_Y[i] + 24) + ' 452,' + (BAY_Y[i] + 24),
+        dot: i === active.bay ? b.ink : '#E7E3DA',
+        anim: 'animation:flow 2.6s linear infinite;animation-delay:-' + (1.3 + i * 0.3).toFixed(2) + 's'
+      })),
+      handle: active.handle,
+      verdict: active.verdict,
+      dot: BAYS[active.bay].ink
+    };
+    CAST.forEach((c, i) => {
+      const on = i === st.step;
+      hero['t' + i] = { stroke: on ? '#1B4FC4' : '#E7E3DA', sw: on ? '2' : '1' };
+    });
+    BAYS.forEach((b, i) => {
+      const on = i === active.bay;
+      hero['b' + i] = { fill: on ? b.fill : '#FFFFFF', stroke: on ? b.ink : '#E7E3DA', sw: on ? '2' : '1' };
+    });
+
+    /* demo 1 */
+    const t = TASKS[st.task];
+    const runs = STEPS[st.runs];
+    const youCost = runs * t.you;
+    const needCost = runs * t.need;
+    const leak = {
+      idx: st.runs,
+      runsLabel: runs.toLocaleString('en-US'),
+      youCost: usd(youCost), needCost: usd(needCost), saving: usd(youCost - needCost),
+      youLine: t.youLine, needLine: t.needLine, why: t.why,
+      fillW: ((t.need / t.you) * 100).toFixed(1) + '%'
+    };
+
+    /* demo 2 */
+    const a = AGENTS[st.agent];
+    const ratio = a.actual / a.claim;
+    const max = Math.max(a.claim, a.actual) * 1.18;
+    const pct = v => ((v / max) * 100).toFixed(1) + '%';
+    const fillColor = ratio >= 0.85 ? '#2F6B4F' : ratio >= 0.5 ? '#8A6A1F' : '#8F3B3B';
+    const dTone = ratio >= 0.85 ? TONE.pass : ratio >= 0.5 ? TONE.warn : TONE.fail;
+    const read = {
+      name: a.name, who: a.who, status: a.status, pill: pill(TONE[a.tone]),
+      verdict: 'Returning ' + Math.round(ratio * 100) + '% of claim.',
+      verdictColor: ratio >= 0.85 ? '#2F6B4F' : '#8F3B3B',
+      claim: usd(a.claim), spend: usd(a.spend), actual: usd(a.actual),
+      claimNote: a.claimNote, spendNote: a.spendNote,
+      delta: Math.round(ratio * 100) + '% of claim',
+      deltaBg: dTone.bg, deltaFg: dTone.fg,
+      fillW: pct(a.actual), tickL: pct(a.claim), fillColor: fillColor,
+      flags: a.flags.map(f => Object.assign({}, f, { markStyle: mark(TONE[f.state]) })),
+      grade: a.grade, gradeColor: this.gradeColor(a.grade), gradeNote: a.gradeNote
+    };
+
+    /* demo 3 */
+    const c = st.call ? CALLS[st.call] : null;
+    const call = {
+      open: !c, settled: !!c,
+      status: c ? c.status : 'Flagged', pill: pill(c ? TONE[c.tone] : TONE.fail),
+      tier: c ? c.tier : 'Frontier',
+      verb: c ? c.verb : '', line: c ? c.line : '',
+      saved: c ? c.saved : '', savedNote: c ? c.savedNote : '',
+      edge: c ? c.edge : '#8F3B3B', edgeBg: c ? c.bg : '#FFFFFF',
+      onKill: () => this.setState({ call: 'Kill' }),
+      onKeep: () => this.setState({ call: 'Keep' }),
+      onOptimize: () => this.setState({ call: 'Optimize' }),
+      onExpand: () => this.setState({ call: 'Expand' }),
+      onReset: () => this.setState({ call: null })
+    };
+
+    /* empty slot */
+    const sd = SLOT[st.slot];
+    const slot = {
+      empty: st.slot === 'today', filled: st.slot === 'ledger',
+      caption: sd.caption,
+      rows: sd.rows.map(r => ({ name: r.name, pill: r.pill, pillStyle: 'display:inline-block;margin-top:7px;' + mark(TONE[r.tone]) })),
+      todayChip: this.tab(st.slot === 'today'),
+      ledgerChip: this.tab(st.slot === 'ledger'),
+      showToday: () => this.setState({ slot: 'today' }),
+      showLedger: () => this.setState({ slot: 'ledger' })
+    };
+
+    return {
+      hero: hero,
+      tasks: TASKS.map((x, i) => ({ label: x.label, chip: this.chip(i === st.task), pick: () => this.setState({ task: i }) })),
+      setRuns: e => this.setState({ runs: parseInt(e.target.value, 10) }),
+      leak: leak,
+      agents: AGENTS.map((x, i) => ({ name: x.name, chip: this.chip(i === st.agent), pick: () => this.setState({ agent: i }) })),
+      read: read,
+      call: call,
+      slot: slot,
+      callCardStyle: 'background:#FFFFFF;border-radius:14px;padding:clamp(20px,3.5vw,26px) clamp(18px,3.5vw,26px);box-shadow:inset 3px 0 0 ' + (c ? c.edge : '#8F3B3B')
+    };
+  }
+}
+
+</script>
+</body>
+</html>
