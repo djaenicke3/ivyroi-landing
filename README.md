@@ -1,6 +1,6 @@
-# Ledger — landing page
+# Ivy ROI — landing page
 
-Static marketing page for Ledger, an adjudication layer for AI spend.
+Static marketing page for Ivy ROI, an adjudication layer for AI spend.
 
 - `index.html` — the page. Interactive demos are Design Component markup driven by `support.js`.
 - `support.js` — the runtime that binds the `{{ }}` holes and `<sc-for>` / `<sc-if>` blocks.

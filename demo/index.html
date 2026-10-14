@@ -3,15 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ledger — the product</title>
+<title>Ivy ROI — the product</title>
 <meta name="description" content="Walk the whole adjudication loop: every agent on one page, the evidence behind each claim, and the four calls finance can make.">
 <meta name="theme-color" content="#f2f5f8">
 <link rel="canonical" href="https://ivyroi.com/demo/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231B4FC4'/><path d='M9 10h14M9 16h14M9 22h8' stroke='white' stroke-width='2.6' stroke-linecap='round'/></svg>">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ivyroi.com/demo/">
-<meta property="og:title" content="Ledger — the product">
+<meta property="og:title" content="Ivy ROI — the product">
 <meta property="og:description" content="Walk the whole adjudication loop: every agent on one page, the evidence behind each claim, and the four calls finance can make.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ivy ROI — the product">
+<meta name="twitter:description" content="Walk the whole adjudication loop: every agent on one page, the evidence behind each claim, and the four calls finance can make.">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -42,7 +45,7 @@
   </div>
   <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 28px;background:rgba(242,245,248,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #dde3ea">
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-      <button onClick="{{ goPortfolio }}" style="border:0;background:transparent;padding:0;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700;font-size:21px;letter-spacing:-0.02em;color:#141d27" style-focus="outline:2px solid #22375c;outline-offset:4px">Ledger</button>
+      <button onClick="{{ goPortfolio }}" style="border:0;background:transparent;padding:0;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700;font-size:21px;letter-spacing:-0.02em;color:#141d27" style-focus="outline:2px solid #22375c;outline-offset:4px">Ivy ROI</button>
       <nav style="display:flex;gap:3px;padding:3px;border-radius:9px;background:#e6eaf0">
         <button onClick="{{ goPortfolio }}" style="{{ nav.portfolio }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Portfolio</button>
         <button onClick="{{ goDecisions }}" style="{{ nav.decisions }}" style-focus="outline:2px solid #22375c;outline-offset:2px">
@@ -1030,8 +1033,8 @@ class Component extends DCLogic {
     const liveCount = A.filter(a => a.status !== 'Revoked').length;
     const revokedList = A.filter(a => a.status === 'Revoked');
     const gw = {
-      url: 'https://gw.ledger.io/v1',
-      key: 'lg_live_••••••••' + st.keySuffix,
+      url: 'https://gw.ivyroi.com/v1',
+      key: 'ivy_live_••••••••' + st.keySuffix,
       switchState: st.routing ? 'On' : 'Off',
       switchPill: st.routing ? pill('Tracking') : pill('Measuring'),
       switchLabel: st.routing ? 'Turn it off' : 'Turn on cost routing',
