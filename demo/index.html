@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledger — the product</title>
+<meta name="description" content="Walk the whole adjudication loop: every agent on one page, the evidence behind each claim, and the four calls finance can make.">
+<meta name="theme-color" content="#f2f5f8">
+<link rel="canonical" href="https://ivyroi.com/demo/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231B4FC4'/><path d='M9 10h14M9 16h14M9 22h8' stroke='white' stroke-width='2.6' stroke-linecap='round'/></svg>">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ivyroi.com/demo/">
+<meta property="og:title" content="Ledger — the product">
+<meta property="og:description" content="Walk the whole adjudication loop: every agent on one page, the evidence behind each claim, and the four calls finance can make.">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #f2f5f8; }
+  * { box-sizing: border-box; }
+  a { color: #22375c; text-decoration: none; }
+  a:hover { color: #17263f; text-decoration: underline; }
+  button, input, select, textarea { font: inherit; }
+  ::selection { background: #d5dfee; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes rowGlow { from { background: #e5edf8; } to { background: transparent; } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#f2f5f8;color:#141d27;font-family:'Figtree',Helvetica,Arial,sans-serif;font-size:14.5px;line-height:1.58">
+
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:9px 20px;background:#141d27;color:#cfd6de;font-size:12.5px">
+    <span>Prototype on sample data. Nothing here is a real agent or a real invoice.</span>
+    <a href="/" style="color:#fff;text-decoration:underline;text-underline-offset:3px">Back to ivyroi.com</a>
+  </div>
+  <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 28px;background:rgba(242,245,248,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #dde3ea">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <button onClick="{{ goPortfolio }}" style="border:0;background:transparent;padding:0;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700;font-size:21px;letter-spacing:-0.02em;color:#141d27" style-focus="outline:2px solid #22375c;outline-offset:4px">Ledger</button>
+      <nav style="display:flex;gap:3px;padding:3px;border-radius:9px;background:#e6eaf0">
+        <button onClick="{{ goPortfolio }}" style="{{ nav.portfolio }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Portfolio</button>
+        <button onClick="{{ goDecisions }}" style="{{ nav.decisions }}" style-focus="outline:2px solid #22375c;outline-offset:2px">
+          <span>Decisions</span>
+          <sc-if value="{{ hasQueue }}" hint-placeholder-val="{{ true }}"><span style="{{ nav.badge }}">{{ queueCount }}</span></sc-if>
+        </button>
+        <button onClick="{{ goGateway }}" style="{{ nav.gateway }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Gateway</button>
+      </nav>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:12.5px;color:#7b8691">{{ headerPeriod }}</span>
+      <button onClick="{{ goProvision }}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 17px;border:0;border-radius:7px;background:{{ accent }};color:#fff;font-weight:600;font-size:13px;cursor:pointer" style-hover="background:#17263f" style-focus="outline:2px solid #141d27;outline-offset:2px">+ Add agent</button>
+    </div>
+  </header>
+
+  <sc-if value="{{ isPortfolio }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width:1280px;margin:0 auto;padding:32px 28px 80px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px">
+      <div>
+        <h1 style="margin:0 0 4px;font-family:'Outfit',sans-serif;font-size:27px;font-weight:600;letter-spacing:-0.02em">Portfolio</h1>
+        <p style="margin:0;color:#59646f;max-width:54ch;text-wrap:pretty">Every agent holding a key, what it promised, and what its traffic says it's worth.</p>
+      </div>
+    </div>
+
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:#dde3ea;border:1px solid #dde3ea;border-radius:12px;overflow:hidden;margin-bottom:26px">
+      <div style="background:#fff;padding:18px 20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">AI spend</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;letter-spacing:-0.01em;margin-top:8px">{{ sum.spend }}</div>
+        <div style="font-size:12.5px;color:#7b8691;margin-top:4px">across {{ sum.countLabel }}, this month</div>
+      </div>
+      <div style="background:#fff;padding:18px 20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">On claim</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;color:#2f6b4f;margin-top:8px">{{ sum.tracking }}</div>
+        <div style="font-size:12.5px;color:#7b8691;margin-top:4px">holding close to what they promised</div>
+      </div>
+      <div style="background:#fff;padding:18px 20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Unverified</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;color:#8a6a1f;margin-top:8px">{{ sum.unverified }}</div>
+        <div style="font-size:12.5px;color:#7b8691;margin-top:4px">no claim, or too little traffic to read</div>
+      </div>
+      <div style="background:#fff;padding:18px 20px;box-shadow:inset 3px 0 0 #8f3b3b">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#8f3b3b">Flagged</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;color:#8f3b3b;margin-top:8px">{{ sum.flagged }}</div>
+        <div style="font-size:12.5px;color:#7b8691;margin-top:4px">{{ sum.atRisk }} waiting on a call</div>
+      </div>
+      <sc-if value="{{ sum.hasRecovered }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;padding:18px 20px;box-shadow:inset 3px 0 0 #2f6b4f">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#2f6b4f">Taken back</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;color:#2f6b4f;margin-top:8px">{{ sum.recovered }}</div>
+        <div style="font-size:12.5px;color:#7b8691;margin-top:4px">{{ sum.recoveredNote }}</div>
+      </div>
+      </sc-if>
+    </section>
+
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <button onClick="{{ filterAll }}" style="{{ chip.all }}" style-focus="outline:2px solid #22375c;outline-offset:2px">All</button>
+      <button onClick="{{ filterFlagged }}" style="{{ chip.flagged }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Flagged</button>
+      <button onClick="{{ filterUnverified }}" style="{{ chip.unverified }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Unverified</button>
+      <span style="margin-left:6px;font-size:12.5px;color:#7b8691">{{ rowCountLabel }}</span>
+    </div>
+
+    <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;overflow-x:auto">
+      <div style="min-width:1300px">
+        <div style="display:grid;grid-template-columns:2.1fr 1.1fr 0.9fr 0.85fr 0.85fr 0.7fr 0.95fr 0.62fr minmax(230px,1.9fr);gap:16px;padding:12px 20px;border-bottom:1px solid #e6eaf0;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">
+          <div>Agent</div><div>Owner</div><div>Team</div><div>Model tier</div><div style="text-align:right">Spend</div><div style="text-align:right">Runs</div><div>Status</div><div>Read</div><div>Claim vs. actual</div>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+          <div onClick="{{ r.open }}" tabIndex="0" onKeyDown="{{ r.onKey }}" style="{{ r.rowStyle }}" style-hover="background:#f6f9fc" style-focus="outline:2px solid #22375c;outline-offset:-2px">
+            <div>
+              <div style="font-weight:600">{{ r.name }}</div>
+              <div style="font-size:12px;color:#74808b;margin-top:2px">{{ r.hypothesis }}</div>
+            </div>
+            <div style="color:#3a4652">{{ r.owner }}</div>
+            <div style="color:#3a4652">{{ r.team }}</div>
+            <div style="color:#3a4652">{{ r.tier }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right">{{ r.spend }}</div>
+            <div style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#59646f">{{ r.runs }}</div>
+            <div>
+              <span style="{{ r.pillStyle }}">{{ r.status }}</span>
+              <sc-if value="{{ r.hasDecision }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:11.5px;color:#7b8691;margin-top:5px">{{ r.decisionMark }}</div>
+              </sc-if>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-weight:500;color:{{ r.readColor }}">{{ r.read }}</div>
+            <div>
+              <div style="position:relative;height:8px;border-radius:999px;background:#e8ecf2">
+                <div style="height:8px;border-radius:999px;width:{{ r.fillW }};background:{{ r.fillColor }}"></div>
+                <div style="position:absolute;top:-4px;left:{{ r.tickL }};width:2px;height:16px;background:#141d27"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-size:12.5px;color:#7b8691">
+                <span style="white-space:nowrap">{{ r.meterLeft }}</span>
+                <span style="white-space:nowrap;color:{{ r.fillColor }}">{{ r.meterRight }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:44px 20px;text-align:center">
+            <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600">Nothing here right now</div>
+            <div style="color:#59646f;margin-top:6px">Switch to All for the full portfolio, or add an agent and we'll start measuring it.</div>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+    <p style="margin:14px 2px 0;font-size:12.5px;color:#89939c">Tick is the claim. Fill is our estimate. The Read column grades how much weight that estimate carries.</p>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isDecisions }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1080px;margin:0 auto;padding:32px 28px 90px">
+    <h1 style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-size:27px;font-weight:600;letter-spacing:-0.02em">Decisions</h1>
+    <p style="margin:0 0 26px;color:#59646f;max-width:60ch;text-wrap:pretty">{{ queueLead }}</p>
+
+    <sc-for list="{{ queue }}" as="q" hint-placeholder-count="3">
+      <section style="border:1px solid #dde3ea;border-left:4px solid {{ q.edge }};border-radius:12px;background:#fff;padding:22px 24px;margin-bottom:16px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap">
+          <div>
+            <button onClick="{{ q.open }}" style="border:0;background:transparent;padding:0;cursor:pointer;font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.01em;color:#141d27" style-hover="text-decoration:underline" style-focus="outline:2px solid #22375c;outline-offset:3px">{{ q.name }}</button>
+            <div style="font-size:13px;color:#59646f;margin-top:3px">{{ q.who }}</div>
+          </div>
+          <span style="{{ q.pillStyle }}">{{ q.status }}</span>
+        </div>
+
+        <div style="margin-top:14px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;color:{{ q.verdictColor }}">{{ q.verdict }}</div>
+
+        <div style="display:flex;gap:26px;flex-wrap:wrap;margin-top:12px;padding:13px 0;border-top:1px solid #eff2f6;border-bottom:1px solid #eff2f6">
+          <div>
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Spend</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;margin-top:3px">{{ q.spend }}</div>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Claim</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;margin-top:3px">{{ q.claim }}</div>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Our read</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;margin-top:3px">{{ q.actual }}</div>
+          </div>
+          <div>
+            <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Confidence</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;margin-top:3px">{{ q.confidence }}</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <sc-for list="{{ q.flags }}" as="qf" hint-placeholder-count="3">
+            <span style="{{ qf.chipStyle }}">{{ qf.chipLabel }}</span>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:16px;padding:14px 16px;border-radius:9px;background:#f5f7fa">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Owner</div>
+          <div style="margin-top:6px;color:#232e39;text-wrap:pretty">{{ q.ownerLine }}</div>
+          <sc-if value="{{ q.hasReply }}" hint-placeholder-val="{{ true }}">
+            <div style="margin-top:10px;padding-left:13px;border-left:2px solid #c2ccd8;color:#3a4652;text-wrap:pretty">{{ q.ownerReply }}</div>
+          </sc-if>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px">
+          <button onClick="{{ q.onKill }}" style="padding:11px 14px;border:1px solid #dbc4c4;border-radius:9px;background:#fff;color:#8f3b3b;font-weight:600;cursor:pointer" style-hover="background:#fbf4f4;border-color:#8f3b3b" style-focus="outline:2px solid #8f3b3b;outline-offset:2px">Kill</button>
+          <button onClick="{{ q.onKeep }}" style="padding:11px 14px;border:1px solid #dde3ea;border-radius:9px;background:#fff;font-weight:600;cursor:pointer" style-hover="background:#f6f9fc;border-color:#b7c1cc" style-focus="outline:2px solid #22375c;outline-offset:2px">Keep</button>
+          <button onClick="{{ q.onOptimize }}" style="padding:11px 14px;border:0;border-radius:9px;background:{{ accent }};color:#fff;font-weight:600;cursor:pointer" style-hover="background:#17263f" style-focus="outline:2px solid #141d27;outline-offset:2px">Optimize</button>
+          <button onClick="{{ q.onExpand }}" style="padding:11px 14px;border:1px solid #dde3ea;border-radius:9px;background:#fff;font-weight:600;cursor:pointer" style-hover="background:#f6f9fc;border-color:#b7c1cc" style-focus="outline:2px solid #22375c;outline-offset:2px">Expand</button>
+        </div>
+        <div style="margin-top:9px;font-size:12.5px;color:#89939c;text-wrap:pretty">{{ q.actionNote }}</div>
+      </section>
+    </sc-for>
+
+    <sc-if value="{{ queueEmpty }}" hint-placeholder-val="{{ false }}">
+      <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:48px 24px;text-align:center">
+        <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Nothing is waiting on you</div>
+        <div style="color:#59646f;margin-top:7px;max-width:46ch;margin-left:auto;margin-right:auto;text-wrap:pretty">Every flag on the books has a call against it. We keep reading the rest and this page fills up again on its own.</div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ hasSettled }}" hint-placeholder-val="{{ true }}">
+      <h2 style="margin:34px 0 12px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Settled this month</h2>
+      <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;overflow:hidden">
+        <sc-for list="{{ settled }}" as="s" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:110px 1.1fr 2.2fr;gap:16px;align-items:baseline;padding:15px 20px;border-bottom:1px solid #eff2f6">
+            <span style="{{ s.verbStyle }}">{{ s.verb }}</span>
+            <button onClick="{{ s.open }}" style="border:0;background:transparent;padding:0;text-align:left;cursor:pointer;font-weight:600;color:#141d27" style-hover="text-decoration:underline" style-focus="outline:2px solid #22375c;outline-offset:3px">{{ s.name }}</button>
+            <div style="font-size:13px;color:#59646f;text-wrap:pretty">{{ s.line }}</div>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:1120px;margin:0 auto;padding:26px 28px 100px">
+    <button onClick="{{ goBack }}" style="border:0;background:transparent;padding:4px 0;margin-bottom:16px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:0.03em;color:#59646f" style-hover="color:#141d27" style-focus="outline:2px solid #22375c;outline-offset:3px">{{ backLabel }}</button>
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px">
+      <div>
+        <h1 style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-size:28px;font-weight:600;letter-spacing:-0.02em">{{ d.name }}</h1>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:#59646f">
+          <span>{{ d.owner }} · {{ d.team }}</span>
+          <span>{{ d.tier }} tier</span>
+          <span>key since {{ d.issued }}</span>
+          <span>{{ d.routingLabel }}</span>
+        </div>
+      </div>
+      <span style="{{ d.pillStyle }}">{{ d.status }}</span>
+    </div>
+
+    <div style="{{ d.verdictStyle }}">
+      <div style="font-family:'Outfit',sans-serif;font-size:16px;font-weight:600">{{ d.verdict }}</div>
+      <div style="margin-top:3px;font-size:13px;opacity:0.85">{{ d.verdictSub }}</div>
+    </div>
+
+    <div style="margin:24px 0 9px;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Monthly figures, August to date</div>
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:0 0 8px">
+      <div style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Claim</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:500;margin-top:10px">{{ d.claim }}</div>
+        <div style="font-size:13px;color:#59646f;margin-top:6px;text-wrap:pretty">{{ d.claimNote }}</div>
+      </div>
+      <div style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Spend</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:500;margin-top:10px">{{ d.spend }}</div>
+        <div style="font-size:13px;color:#59646f;margin-top:6px;text-wrap:pretty">{{ d.spendNote }}</div>
+      </div>
+      <div style="border:1.5px solid #22375c;border-radius:12px;background:#eaf0f8;padding:20px;box-shadow:0 1px 0 rgba(34,55,92,0.12)">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#22375c">Actual · our read</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;color:#17263f;margin-top:10px">{{ d.actual }}</div>
+        <div style="display:inline-block;margin-top:8px;padding:3px 9px;border-radius:5px;background:{{ d.deltaBg }};color:{{ d.deltaFg }};font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500">{{ d.delta }}</div>
+        <div style="font-size:13px;color:#3a4652;margin-top:8px;text-wrap:pretty">{{ d.actualNote }}</div>
+      </div>
+    </section>
+
+    <section style="display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;margin-top:14px">
+      <div style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:20px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Confidence in this read</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:{{ d.confidenceColor }}">{{ d.confidence }}</div>
+        </div>
+        <div style="margin-top:10px;color:#232e39;text-wrap:pretty">{{ d.confidenceBasis }}</div>
+        <div style="margin-top:8px;font-size:13px;color:#59646f;text-wrap:pretty">{{ d.confidenceLift }}</div>
+      </div>
+      <div style="border:1px solid #e1d2ac;border-radius:12px;background:#fbf8f0;padding:20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#8a6a1f">Where we stop</div>
+        <div style="margin-top:10px;color:#4a4125;text-wrap:pretty">{{ d.boundary }}</div>
+      </div>
+    </section>
+
+    <h2 style="margin:30px 0 12px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Three flags, read separately</h2>
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+      <sc-for list="{{ d.flags }}" as="f" hint-placeholder-count="3">
+        <div style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <div style="font-weight:600">{{ f.title }}</div>
+            <span style="{{ f.markStyle }}">{{ f.mark }}</span>
+          </div>
+          <div style="font-size:13px;color:#59646f;margin-top:8px;text-wrap:pretty">{{ f.body }}</div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid #edf0f4;display:flex;justify-content:space-between;font-size:12.5px;color:#7b8691">
+            <span>Confidence</span><span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#141d27">{{ f.grade }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </section>
+
+    <sc-if value="{{ d.showOwner }}" hint-placeholder-val="{{ true }}">
+      <h2 style="margin:30px 0 12px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">The owner's answer</h2>
+      <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:20px 22px">
+        <div style="color:#232e39;text-wrap:pretty">{{ d.ownerLine }}</div>
+        <sc-if value="{{ d.hasReply }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:12px;padding-left:14px;border-left:2px solid #c2ccd8;color:#3a4652;text-wrap:pretty">{{ d.ownerReply }}</div>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <h2 style="margin:30px 0 12px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">What the traffic shows</h2>
+    <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;overflow:hidden">
+      <sc-for list="{{ d.evidence }}" as="e" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:minmax(160px,0.7fr) 2fr;gap:16px;padding:14px 20px;border-bottom:1px solid #eff2f6">
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">{{ e.label }}</div>
+          <div style="color:#232e39;text-wrap:pretty">{{ e.value }}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <sc-if value="{{ d.open }}" hint-placeholder-val="{{ true }}">
+      <h2 style="margin:32px 0 4px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Make the call</h2>
+      <p style="margin:0 0 14px;color:#59646f;max-width:62ch;text-wrap:pretty">{{ d.decisionNote }}</p>
+      <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:stretch">
+        <button onClick="{{ d.onKill }}" style="text-align:left;padding:16px;border:1px solid #dbc4c4;border-radius:11px;background:#fff;cursor:pointer" style-hover="background:#fbf4f4;border-color:#8f3b3b" style-focus="outline:2px solid #8f3b3b;outline-offset:2px">
+          <div style="font-weight:600;color:#8f3b3b">Kill</div>
+          <div style="font-size:12.5px;color:#59646f;margin-top:5px;text-wrap:pretty">{{ d.killNote }}</div>
+        </button>
+        <button onClick="{{ d.onKeep }}" style="text-align:left;padding:16px;border:1px solid #dde3ea;border-radius:11px;background:#fff;cursor:pointer" style-hover="background:#f6f9fc;border-color:#b7c1cc" style-focus="outline:2px solid #22375c;outline-offset:2px">
+          <div style="font-weight:600">Keep</div>
+          <div style="font-size:12.5px;color:#59646f;margin-top:5px;text-wrap:pretty">Live with the spend. It lands back here on {{ d.reviewDate }}.</div>
+        </button>
+        <button onClick="{{ d.onOptimize }}" style="text-align:left;padding:16px;border:1.5px solid {{ accent }};border-radius:11px;background:{{ accent }};color:#fff;cursor:pointer;box-shadow:0 2px 10px rgba(34,55,92,0.22)" style-hover="background:#17263f" style-focus="outline:2px solid #141d27;outline-offset:2px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div style="font-weight:700">Optimize</div>
+            <span style="font-size:11px;font-weight:600;letter-spacing:0.02em;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.18)">Ours alone</span>
+          </div>
+          <div style="font-size:12.5px;color:#d9e2f1;margin-top:5px;text-wrap:pretty">{{ d.optimizeNote }}</div>
+        </button>
+        <button onClick="{{ d.onExpand }}" style="text-align:left;padding:16px;border:1px solid #dde3ea;border-radius:11px;background:#fff;cursor:pointer" style-hover="background:#f6f9fc;border-color:#b7c1cc" style-focus="outline:2px solid #22375c;outline-offset:2px">
+          <div style="font-weight:600">Expand</div>
+          <div style="font-size:12.5px;color:#59646f;margin-top:5px;text-wrap:pretty">Lift the run ceiling and give it more of the work.</div>
+        </button>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ d.settledView }}" hint-placeholder-val="{{ false }}">
+      <h2 style="margin:32px 0 12px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">The call</h2>
+      <section style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:20px 22px;border:1px solid #dde3ea;border-left:4px solid {{ d.settledEdge }};border-radius:12px;background:#fff">
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:{{ d.settledEdge }}">{{ d.settledVerb }} on {{ d.settledOn }}</div>
+          <div style="margin-top:5px;color:#59646f;max-width:60ch;text-wrap:pretty">{{ d.settledLine }}</div>
+        </div>
+        <button onClick="{{ d.onReopen }}" style="padding:10px 16px;border:1px solid #d5dce4;border-radius:8px;background:#fff;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:#f6f9fc" style-focus="outline:2px solid #22375c;outline-offset:2px">Reopen the call</button>
+      </section>
+    </sc-if>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isGateway }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:900px;margin:0 auto;padding:32px 28px 90px">
+    <h1 style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-size:27px;font-weight:600;letter-spacing:-0.02em">Gateway</h1>
+    <p style="margin:0 0 26px;color:#59646f;max-width:60ch;text-wrap:pretty">One key, one endpoint, every model behind it. Nothing else on this site works unless the calls come through here first.</p>
+
+    <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:22px 24px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px">
+        <div>
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Base URL</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:15px;margin-top:7px;word-break:break-all">{{ gw.url }}</div>
+        </div>
+        <div>
+          <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Org key</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:7px">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:15px">{{ gw.key }}</span>
+            <button onClick="{{ rotateKey }}" style="padding:6px 12px;border:1px solid #d5dce4;border-radius:7px;background:#fff;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#f6f9fc" style-focus="outline:2px solid #22375c;outline-offset:2px">Rotate</button>
+          </div>
+        </div>
+      </div>
+      <p style="margin:16px 0 0;font-size:13px;color:#59646f;max-width:64ch;text-wrap:pretty">Point your SDKs at that URL. Your code keeps the shape it already has, and every call an agent makes lands in front of us before it reaches a model.</p>
+    </section>
+
+    <section style="{{ gw.routingStyle }}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+        <div style="max-width:56ch">
+          <div style="display:flex;align-items:center;gap:11px">
+            <div style="font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Cost routing</div>
+            <span style="{{ gw.switchPill }}">{{ gw.switchState }}</span>
+          </div>
+          <p style="margin:10px 0 0;color:{{ gw.routingFg }};text-wrap:pretty">{{ gw.routingCopy }}</p>
+        </div>
+        <button onClick="{{ toggleRouting }}" style="{{ gw.switchBtn }}" style-focus="outline:2px solid #141d27;outline-offset:2px">{{ gw.switchLabel }}</button>
+      </div>
+    </section>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:20px">
+      <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:20px 22px">
+        <h2 style="margin:0 0 12px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:600">What we read</h2>
+        <sc-for list="{{ gw.reads }}" as="rd" hint-placeholder-count="3">
+          <div style="padding:9px 0;border-top:1px solid #eff2f6;color:#232e39;text-wrap:pretty">{{ rd.text }}</div>
+        </sc-for>
+      </section>
+      <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:20px 22px">
+        <h2 style="margin:0 0 12px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:600">What we leave alone</h2>
+        <sc-for list="{{ gw.avoids }}" as="av" hint-placeholder-count="2">
+          <div style="padding:9px 0;border-top:1px solid #eff2f6;color:#232e39;text-wrap:pretty">{{ av.text }}</div>
+        </sc-for>
+      </section>
+    </div>
+
+    <h2 style="margin:32px 0 12px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:600">Keys we pulled</h2>
+    <section style="border:1px solid #dde3ea;border-radius:12px;background:#fff;overflow:hidden">
+      <sc-for list="{{ gw.revoked }}" as="rv" hint-placeholder-count="1">
+        <div style="display:grid;grid-template-columns:1.1fr 2.2fr;gap:16px;align-items:baseline;padding:15px 20px;border-bottom:1px solid #eff2f6">
+          <div style="font-weight:600">{{ rv.name }}</div>
+          <div style="font-size:13px;color:#59646f;text-wrap:pretty">{{ rv.line }}</div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ gw.noRevoked }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:30px 20px;color:#59646f;text-wrap:pretty">No keys pulled yet. When finance kills an agent it stops here, not in an email asking someone to stop.</div>
+      </sc-if>
+    </section>
+
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:#dde3ea;border:1px solid #dde3ea;border-radius:12px;overflow:hidden;margin-top:20px">
+      <div style="background:#fff;padding:18px 20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Calls this month</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;margin-top:8px">{{ gw.calls }}</div>
+      </div>
+      <div style="background:#fff;padding:18px 20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Keys live</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;margin-top:8px">{{ gw.live }}</div>
+      </div>
+      <div style="background:#fff;padding:18px 20px">
+        <div style="font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691">Routed by us</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;margin-top:8px">{{ gw.routed }}</div>
+      </div>
+    </section>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isProvision }}" hint-placeholder-val="{{ false }}">
+  <main style="max-width:760px;margin:0 auto;padding:26px 28px 100px">
+    <button onClick="{{ goPortfolio }}" style="border:0;background:transparent;padding:4px 0;margin-bottom:16px;cursor:pointer;font-size:12px;font-weight:600;letter-spacing:0.03em;color:#59646f" style-hover="color:#141d27" style-focus="outline:2px solid #22375c;outline-offset:3px">← Portfolio</button>
+    <h1 style="margin:0 0 6px;font-family:'Outfit',sans-serif;font-size:28px;font-weight:600;letter-spacing:-0.02em">Add an agent</h1>
+    <p style="margin:0 0 26px;color:#59646f;max-width:58ch;text-wrap:pretty">Say what it's worth before it runs. That number is what we measure against later.</p>
+
+    <div style="border:1px solid #dde3ea;border-radius:12px;background:#fff;padding:24px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px">
+        <label style="display:block">
+          <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:7px">Agent name</span>
+          <input value="{{ form.name }}" onChange="{{ setName }}" placeholder="Contract Redliner" style="width:100%;padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe" style-focus="outline:2px solid #22375c;outline-offset:1px;border-color:#22375c" />
+        </label>
+        <label style="display:block">
+          <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:7px">Owner</span>
+          <input value="{{ form.owner }}" onChange="{{ setOwner }}" placeholder="Dana Whitfield" style="width:100%;padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe" style-focus="outline:2px solid #22375c;outline-offset:1px;border-color:#22375c" />
+        </label>
+        <label style="display:block">
+          <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:7px">Team</span>
+          <select value="{{ form.team }}" onChange="{{ setTeam }}" style="width:100%;padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe" style-focus="outline:2px solid #22375c;outline-offset:1px">
+            <option>Finance Ops</option><option>Legal</option><option>Support</option><option>Revenue</option><option>People</option><option>Data Platform</option><option>IT Security</option>
+          </select>
+        </label>
+        <label style="display:block">
+          <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:7px">How often it runs</span>
+          <select value="{{ form.frequency }}" onChange="{{ setFrequency }}" style="width:100%;padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe" style-focus="outline:2px solid #22375c;outline-offset:1px">
+            <option>Every event</option><option>Hourly</option><option>Daily</option><option>Weekly</option><option>Monthly</option>
+          </select>
+        </label>
+      </div>
+
+      <label style="display:block;margin-top:18px">
+        <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:7px">Whose work does this take over</span>
+        <textarea value="{{ form.hypothesis }}" onChange="{{ setHypothesis }}" rows="3" placeholder="A paralegal reads every vendor contract and marks clauses that fall outside policy." style="width:100%;padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe;resize:vertical;font-family:'Figtree',sans-serif" style-focus="outline:2px solid #22375c;outline-offset:1px;border-color:#22375c"></textarea>
+        <span style="display:block;margin-top:6px;font-size:12.5px;color:#7b8691">Plain words. We judge the output against this.</span>
+      </label>
+
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid #edf0f4">
+        <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:9px">Model tier</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ setTierEconomy }}" style="{{ tierChip.Economy }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Economy</button>
+          <button onClick="{{ setTierOptimized }}" style="{{ tierChip.Optimized }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Optimized · default</button>
+          <button onClick="{{ setTierFrontier }}" style="{{ tierChip.Frontier }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Frontier</button>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid #edf0f4">
+        <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:9px">Cost routing</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ setRoutingOff }}" style="{{ routeChip.off }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Leave it off · default</button>
+          <button onClick="{{ setRoutingOn }}" style="{{ routeChip.on }}" style-focus="outline:2px solid #22375c;outline-offset:2px">Let us reroute it</button>
+        </div>
+        <span style="display:block;margin-top:9px;font-size:12.5px;color:#7b8691;max-width:60ch;text-wrap:pretty">Off means we watch and grade, nothing more. Hand us the wheel later from this agent's own page, once you believe the readings.</span>
+      </div>
+
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid #edf0f4">
+        <span style="display:block;font-size:11.5px;font-weight:600;letter-spacing:0.03em;color:#7b8691;margin-bottom:9px">What it's worth</span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+          <select value="{{ form.claimType }}" onChange="{{ setClaimType }}" style="padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe" style-focus="outline:2px solid #22375c;outline-offset:1px">
+            <option>Time saved</option><option>Cost avoided</option><option>Revenue influenced</option>
+          </select>
+          <input value="{{ form.claimAmount }}" onChange="{{ setClaimAmount }}" inputMode="decimal" placeholder="30" style="padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe;font-family:'IBM Plex Mono',monospace" style-focus="outline:2px solid #22375c;outline-offset:1px;border-color:#22375c" />
+          <select value="{{ form.claimUnit }}" onChange="{{ setClaimUnit }}" style="padding:11px 12px;border:1px solid #d5dce4;border-radius:8px;background:#fcfdfe" style-focus="outline:2px solid #22375c;outline-offset:1px">
+            <option>minutes per run</option><option>hours per run</option><option>dollars per run</option><option>dollars per month</option>
+          </select>
+        </div>
+        <sc-if value="{{ showUnquantified }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:12px;margin-top:14px;padding:13px 15px;border:1px solid #e1d2ac;border-left:3px solid #8a6a1f;border-radius:8px;background:#fbf7ec">
+            <div style="font-size:12.5px;font-weight:600;color:#8a6a1f;white-space:nowrap">Unquantified</div>
+            <div style="font-size:13px;color:#4a4125;text-wrap:pretty">Blank means this agent ships with no claim. We'll still watch its output, but there's nothing to hold it to. Put a number here and you get a claim vs. actual reading instead.</div>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ formError }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:16px;padding:12px 15px;border:1px solid #dbc4c4;border-left:3px solid #8f3b3b;border-radius:8px;background:#fbf4f4;font-size:13px;color:#6b3131">{{ formError }}</div>
+      </sc-if>
+
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:24px;padding-top:20px;border-top:1px solid #edf0f4">
+        <button onClick="{{ issueKey }}" style="padding:12px 20px;border:0;border-radius:8px;background:{{ accent }};color:#fff;font-weight:600;cursor:pointer" style-hover="background:#17263f" style-focus="outline:2px solid #141d27;outline-offset:2px">Issue the key</button>
+        <button onClick="{{ goPortfolio }}" style="padding:12px 16px;border:1px solid #d5dce4;border-radius:8px;background:#fff;cursor:pointer" style-hover="background:#f6f9fc" style-focus="outline:2px solid #22375c;outline-offset:2px">Back</button>
+        <span style="font-size:12.5px;color:#7b8691">Traffic runs through our gateway from the first call.</span>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:12px;max-width:min(560px,92vw);padding:13px 18px;border-radius:10px;background:#141d27;color:#f0f4f8;box-shadow:0 10px 30px rgba(20,29,39,0.28);animation:toastIn 180ms ease-out">
+      <span style="width:7px;height:7px;border-radius:50%;background:{{ toastDot }};flex:none"></span>
+      <span style="font-size:13.5px">{{ toast }}</span>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accentColor":{"editor":"color","default":"#22375c","tsType":"string","options":["#22375c","#1c3a52","#2c3e6b","#28303f"]},"density":{"editor":"enum","default":"comfortable","options":["comfortable","compact"],"tsType":"string"},"requireClaim":{"editor":"boolean","default":true,"tsType":"boolean","section":"Provisioning"},"$preview":{"width":1440,"height":980}}'>
+const usd = n => '$' + Math.round(n).toLocaleString('en-US');
+const WORD = ['no', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+const count = n => (n < 10 ? WORD[n] : String(n));
+
+const STATUS = {
+  Tracking:   { fg: '#2f6b4f', bg: '#eaf2ed', bd: '#cfe0d6' },
+  Unverified: { fg: '#8a6a1f', bg: '#faf5e9', bd: '#e6dcc2' },
+  Flagged:    { fg: '#8f3b3b', bg: '#f9eeee', bd: '#e3cbcb' },
+  Measuring:  { fg: '#47535f', bg: '#edf0f4', bd: '#d9dfe6' },
+  Revoked:    { fg: '#5a6470', bg: '#eef1f4', bd: '#dbe1e7' }
+};
+
+const VERB = {
+  Killed:    { fg: '#8f3b3b', bg: '#f9eeee', bd: '#e3cbcb' },
+  Kept:      { fg: '#47535f', bg: '#edf0f4', bd: '#d9dfe6' },
+  Optimized: { fg: '#22375c', bg: '#eaf0f8', bd: '#ccd8ea' },
+  Expanded:  { fg: '#2f6b4f', bg: '#eaf2ed', bd: '#cfe0d6' }
+};
+
+const SEED = [
+  { id: 'a1', name: 'Contract Redliner', hypothesis: 'Paralegal review of vendor contracts', owner: 'Dana Whitfield', team: 'Legal', tier: 'Optimized', spend: 4120, runs: 1284, claim: 12000, actual: 11100, status: 'Tracking', issued: 'Mar 4', reroute: false, saving: 1340, routeTo: 'Optimized', routeLine: 'Anything under four pages drops to Economy. Long agreements keep the tier they have.',
+    claimNote: '25 minutes a contract, at a $58 blended paralegal rate.', spendNote: '1,284 runs so far, $3.21 a run.', actualNote: 'Redlines match policy on 94% of contracts. Two clause types still get missed.',
+    confidence: 'A−', confidenceBasis: 'Sits on 1,284 runs since March and on the accept rate Legal produces without being asked.', confidenceLift: 'Split short NDAs from long MSAs and the read goes to A.',
+    boundary: 'Claimed, unverified. Twenty-five minutes a contract is Dana\'s figure, not ours. We test whether the work supports it. We never time the paralegal.',
+    ownerState: 'none', ownerLine: '', ownerReply: null,
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', grade: 'A', body: 'Reads the whole contract and returns clause-level marks every time.' },
+      { title: 'Output quality', mark: 'Pass', state: 'pass', grade: 'B+', body: 'Legal took 94% of the last 200 redlines without edits.' },
+      { title: 'Spend line', mark: 'Warn', state: 'warn', grade: 'A−', body: 'A four-page NDA gets the same tier as a 90-page MSA.' }
+    ],
+    evidence: [
+      { label: 'Inputs used', value: 'Contract text plus the live clause policy, about 11,400 tokens a run.' },
+      { label: 'Output size', value: 'Six to fourteen clause marks a contract.' },
+      { label: 'Run to run', value: 'Genuinely different output on 91% of runs, so nothing is being served from cache.' },
+      { label: 'Model called', value: 'Optimized, every run. No retry storms.' }
+    ],
+    killNote: 'Dana hears first and has 48 hours to answer.',
+    optimizeNote: 'Send anything under four pages to Economy. About $1,340 a month, same accept rate.' },
+
+  { id: 'a2', name: 'Invoice Triage', hypothesis: 'AP clerk coding and routing invoices', owner: 'Marco Reyes', team: 'Finance Ops', tier: 'Frontier', spend: 9480, runs: 3910, claim: 28000, actual: 5040, status: 'Flagged', issued: 'Jan 18', reroute: false, saving: 6900, routeTo: 'Optimized', routeLine: 'Extraction moves to Economy. The 18% that need judgment stay on Frontier.',
+    claimNote: '8 minutes an invoice, 3,500 invoices a month.', spendNote: '$2.42 a call, 3,910 calls. It adds up fast.', actualNote: 'Four calls in five restate what the ERP already parsed. Real coding happens on 18% of invoices.',
+    confidence: 'B', confidenceBasis: 'Seven months of traffic, and every GL code AP quietly changed after the agent set it.', confidenceLift: 'Give us a week of split traffic and we read the two groups apart. That takes it to A.',
+    boundary: 'Claimed, unverified. The eight minutes an invoice came from Marco. We check the work against it. We don\'t run a stopwatch on AP.',
+    ownerState: 'answered', ownerLine: 'Marco answered on Aug 22, three days after the flag went out.',
+    ownerReply: 'The ERP overlap is real and I knew about it. I built this for the 18% the ERP cannot code, then never split the traffic, so it runs on everything. Two weeks and I can gate it properly.',
+    flags: [
+      { title: 'Execution', mark: 'Warn', state: 'warn', grade: 'A', body: 'It runs on everything, but 82% of calls echo fields the ERP already had.' },
+      { title: 'Output quality', mark: 'Fail', state: 'fail', grade: 'B', body: 'On the invoices that need judgment, AP changed the GL code 31% of the time.' },
+      { title: 'Spend line', mark: 'Fail', state: 'fail', grade: 'A', body: 'Frontier tier on extraction work. Economy matches it.' }
+    ],
+    evidence: [
+      { label: 'Inputs used', value: 'Invoice PDF plus the ERP record. The ERP record alone answers most prompts.' },
+      { label: 'Output size', value: 'About 210 tokens back, mostly the input fields in JSON.' },
+      { label: 'Run to run', value: 'Near-identical output on 74% of repeat runs for the same vendor.' },
+      { label: 'Model called', value: 'Frontier on all 3,910 runs, retries included.' }
+    ],
+    killNote: 'Marco hears first and has 48 hours to answer.',
+    optimizeNote: 'Extraction to Economy, keep Frontier for the 18% that need judgment. About $6,900 a month.' },
+
+  { id: 'a3', name: 'Support Draft Assistant', hypothesis: 'First reply on inbound tickets', owner: 'Priya Raman', team: 'Support', tier: 'Optimized', spend: 2340, runs: 6120, claim: 9000, actual: 10400, status: 'Tracking', issued: 'Feb 9', reroute: true, saving: 410, routeTo: 'Optimized', routeLine: 'The account lookup is cached across a thread. Same model, far fewer calls.',
+    claimNote: '4 minutes a ticket, 6,000 tickets a month.', spendNote: '6,120 runs. Thirty-eight cents each.', actualNote: 'Agents send 71% of drafts with light edits, and first response dropped by nine minutes.',
+    confidence: 'A', confidenceBasis: 'Six thousand runs a month, and a send-or-rewrite signal we can watch directly on every one.', confidenceLift: 'Nothing to add here.',
+    boundary: 'Claimed, unverified. Four minutes a ticket is Priya\'s number. We read the drafts, not the agents typing beside them.',
+    ownerState: 'none', ownerLine: '', ownerReply: null,
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', grade: 'A', body: 'Pulls the thread and the account record on every run.' },
+      { title: 'Output quality', mark: 'Pass', state: 'pass', grade: 'A−', body: '71% of drafts go out with minor edits. Escalations held flat.' },
+      { title: 'Spend line', mark: 'Pass', state: 'pass', grade: 'B+', body: 'Economy drafts were rejected twice as often. This is the right floor.' }
+    ],
+    evidence: [
+      { label: 'Inputs used', value: 'Ticket thread, account tier, last three resolved tickets.' },
+      { label: 'Output size', value: 'Around 340 tokens. A full reply, not a snippet.' },
+      { label: 'Run to run', value: 'Ninety-six runs in a hundred come back different.' },
+      { label: 'Model called', value: 'Optimized, escalating to Frontier only on the longest threads.' }
+    ],
+    killNote: 'Priya hears first and has 48 hours to answer.',
+    optimizeNote: 'Cache the account lookup across a thread. About $410 a month, quality untouched.' },
+
+  { id: 'a4', name: 'Sales Call Summarizer', hypothesis: 'AE write-ups after discovery calls', owner: 'Ben Okafor', team: 'Revenue', tier: 'Economy', spend: 760, runs: 2050, claim: 4500, actual: null, status: 'Unverified', issued: 'Jun 22', reroute: false, saving: 0, routeTo: null, routeLine: null,
+    claimNote: '12 minutes a call, 375 calls a month.', spendNote: '2,050 runs at $0.37. Cheap, which is part of why nobody has looked at it.', actualNote: 'The summaries get written. Almost nobody opens them, so there is no downstream signal to price.',
+    confidence: 'C+', confidenceBasis: 'Two thousand runs, and almost nothing after them: twelve percent of these summaries were ever opened.', confidenceLift: 'Put the summaries where people already work and the read becomes real.',
+    boundary: 'Claimed, unverified. Twelve minutes a call is Ben\'s estimate, and nothing downstream either confirms it or contradicts it.',
+    ownerState: 'answered', ownerLine: 'Ben answered on Aug 24.',
+    ownerReply: 'Nobody reads them because they land in a notes field two clicks off the opportunity. Move the write-up onto the record and give me a month.',
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', grade: 'B', body: 'Every transcript it receives comes back as a summary.' },
+      { title: 'Output quality', mark: 'Warn', state: 'warn', grade: 'C+', body: 'Twelve percent of summaries were ever opened. Use tells us almost nothing here.' },
+      { title: 'Spend line', mark: 'Pass', state: 'pass', grade: 'A', body: 'Already on the cheapest tier that can do this.' }
+    ],
+    evidence: [
+      { label: 'Inputs used', value: 'Just the transcript. Nobody passes in the opportunity record.' },
+      { label: 'Output size', value: 'Short and uniform, roughly 260 tokens.' },
+      { label: 'Run to run', value: 'Output tracks each transcript closely. Real per-call work.' },
+      { label: 'Model called', value: 'Economy, every run.' }
+    ],
+    killNote: 'Ben hears first and has 48 hours to answer.',
+    optimizeNote: 'Write summaries onto the opportunity instead of a notes field, so use becomes visible.' },
+
+  { id: 'a5', name: 'Security Log Reviewer', hypothesis: 'Analyst triage of overnight alerts', owner: 'Lena Fischer', team: 'IT Security', tier: 'Frontier', spend: 7900, runs: 540, claim: 15000, actual: 3600, status: 'Flagged', issued: 'Dec 2', reroute: false, saving: 6100, routeTo: 'Optimized', routeLine: 'The window gets filtered before a model sees it. Frontier fires only when a rule does.',
+    claimNote: '2.5 analyst hours a night at a $92 loaded rate.', spendNote: '540 runs. Fourteen dollars and change every night.', actualNote: 'Nine nights in ten it confirms an empty queue. The value sits in the other one.',
+    confidence: 'B−', confidenceBasis: 'Five hundred and forty nights, checked against the analyst\'s own queue for the same window.', confidenceLift: 'Nine nights in ten are empty, so the sample that matters is thin. More real alerts, better read.',
+    boundary: 'Claimed, unverified. Two and a half analyst hours a night is Lena\'s figure. We read the queue, not her evening.',
+    ownerState: 'silent', ownerLine: 'Lena was notified Aug 19 and has not answered. Fourteen hours left, then we reroute it and tell her after.',
+    ownerReply: null,
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', grade: 'A', body: 'Reads the full overnight window every run.' },
+      { title: 'Output quality', mark: 'Warn', state: 'warn', grade: 'B−', body: 'Caught everything the analyst caught, plus 4.2 false alarms a night.' },
+      { title: 'Spend line', mark: 'Fail', state: 'fail', grade: 'A', body: '180k tokens of routine log lines through Frontier to find nothing.' }
+    ],
+    evidence: [
+      { label: 'Inputs used', value: 'The whole twelve-hour window, unfiltered. 178,000 tokens a night.' },
+      { label: 'Output size', value: 'Ninety tokens. Usually one line: nothing to act on.' },
+      { label: 'Run to run', value: 'Same conclusion on 91% of consecutive nights.' },
+      { label: 'Model called', value: 'Frontier on all 540 runs.' }
+    ],
+    killNote: 'Lena hears first and has 48 hours to answer.',
+    optimizeNote: 'Filter the window first, escalate to Frontier only when a rule fires. About $6,100 a month.' },
+
+  { id: 'a6', name: 'Recruiting Screener', hypothesis: 'Recruiter first pass on applications', owner: 'Tom Alderman', team: 'People', tier: 'Optimized', spend: 1180, runs: 880, claim: null, actual: null, status: 'Unverified', issued: 'Jul 30', reroute: false, saving: 0, routeTo: null, routeLine: null,
+    claimNote: 'Shipped with no claim on file.', spendNote: '880 runs, $1.34 each.', actualNote: 'The work looks sound. With no claim on file there is nothing to weigh it against.',
+    confidence: null, confidenceBasis: 'No claim on file, so there is nothing to grade. A confidence letter appears the day Tom names a number.', confidenceLift: 'One number from Tom and this whole page starts working.',
+    boundary: 'No claim set, so there is nothing to hold this to. Everything on this page is the work standing on its own.',
+    ownerState: 'silent', ownerLine: 'Tom was notified Aug 12 and again on Aug 20. Still no number.', ownerReply: null,
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', grade: 'B+', body: 'Scores each application against the role brief and says why.' },
+      { title: 'Output quality', mark: 'Warn', state: 'warn', grade: 'C', body: 'Across ninety applications, recruiters agreed with the screen about two-thirds of the time.' },
+      { title: 'Spend line', mark: 'Pass', state: 'pass', grade: 'B', body: 'Fair tier for a judgment call on two pages.' }
+    ],
+    evidence: [
+      { label: 'Inputs used', value: 'Resume and role brief, nothing else.' },
+      { label: 'Output size', value: 'A score and two sentences of reasoning.' },
+      { label: 'Run to run', value: 'It moves with the candidate, run after run.' },
+      { label: 'Model called', value: 'Optimized, every run.' }
+    ],
+    killNote: 'Tom hears first and has 48 hours to answer.',
+    optimizeNote: 'Get a number from Tom first. Nothing to route until this agent has a claim.' },
+
+  { id: 'a7', name: 'Data Migration Bot', hypothesis: 'Engineer mapping legacy fields by hand', owner: 'Aisha Nasser', team: 'Data Platform', tier: 'Economy', spend: 410, runs: 12400, claim: 3000, actual: 3350, status: 'Tracking', issued: 'May 11', reroute: true, saving: 120, routeTo: 'Economy', routeLine: 'Twenty records a call instead of one. Same tier, a twentieth of the requests.',
+    claimNote: '$3,000 a month of engineering time on schema mapping.', spendNote: '12,400 runs. Three cents each.', actualNote: 'Almost every mapping passes validation, and the migration is two weeks ahead.',
+    confidence: 'A', confidenceBasis: '12,400 runs, and a validator that says pass or fail on every single one.', confidenceLift: 'Nothing left to prove here.',
+    boundary: 'Claimed, unverified. Aisha priced the engineering time herself. We can see the mappings pass; the rate behind them is hers.',
+    ownerState: 'none', ownerLine: '', ownerReply: null,
+    flags: [
+      { title: 'Execution', mark: 'Pass', state: 'pass', grade: 'A', body: 'Maps and validates every record handed to it.' },
+      { title: 'Output quality', mark: 'Pass', state: 'pass', grade: 'A', body: 'Nearly all pass validation. Failures go to a human queue.' },
+      { title: 'Spend line', mark: 'Pass', state: 'pass', grade: 'A', body: 'Three cents a run. Nothing cheaper exists.' }
+    ],
+    evidence: [
+      { label: 'Inputs used', value: 'Source record and both schemas. Small prompts, huge volume.' },
+      { label: 'Output size', value: '240 tokens of mapped field pairs.' },
+      { label: 'Run to run', value: 'Every record gets its own answer.' },
+      { label: 'Model called', value: 'Economy, every run.' }
+    ],
+    killNote: 'Aisha hears first and has 48 hours to answer.',
+    optimizeNote: 'Batch 20 records a call. About $120 a month, same pass rate.' }
+];
+
+const pill = s => {
+  const c = STATUS[s] || STATUS.Measuring;
+  return 'display:inline-block;padding:3px 10px;border-radius:999px;border:1px solid ' + c.bd + ';background:' + c.bg + ';color:' + c.fg + ';font-size:11.5px;font-weight:600;letter-spacing:0.01em';
+};
+
+const tone = state => state === 'pass' ? STATUS.Tracking : state === 'warn' ? STATUS.Unverified : STATUS.Flagged;
+
+const markStyle = state => {
+  const c = tone(state);
+  return 'padding:2px 9px;border-radius:5px;background:' + c.bg + ';color:' + c.fg + ';font-size:11.5px;font-weight:600;letter-spacing:0.01em';
+};
+
+const chipFlag = state => {
+  const c = tone(state);
+  return 'display:inline-block;padding:4px 11px;border-radius:6px;border:1px solid ' + c.bd + ';background:' + c.bg + ';color:' + c.fg + ';font-size:12px;font-weight:500';
+};
+
+const verbStyle = v => {
+  const c = VERB[v] || VERB.Kept;
+  return 'display:inline-block;padding:3px 11px;border-radius:999px;border:1px solid ' + c.bd + ';background:' + c.bg + ';color:' + c.fg + ';font-size:11.5px;font-weight:600';
+};
+
+const BLANK_FORM = { name: '', owner: '', team: 'Finance Ops', frequency: 'Daily', hypothesis: '', tier: 'Optimized', routing: false, claimType: 'Time saved', claimAmount: '', claimUnit: 'minutes per run' };
+
+class Component extends DCLogic {
+  state = {
+    screen: 'portfolio', from: 'portfolio', filter: 'All', selected: null, highlight: null,
+    toast: null, toastDot: '#7fb3a0', formError: null, routing: false, seq: 0,
+    keySuffix: '4471', form: Object.assign({}, BLANK_FORM), agents: SEED
+  };
+
+  componentWillUnmount() { clearTimeout(this._t); }
+
+  flash(msg, dot) {
+    clearTimeout(this._t);
+    this.setState({ toast: msg, toastDot: dot || '#7fb3a0' });
+    this._t = setTimeout(() => this.setState({ toast: null }), 4600);
+  }
+
+  set(k) { return e => this.setState(s => ({ form: Object.assign({}, s.form, { [k]: e.target.value }) })); }
+
+  open(a, from) { return () => this.setState({ screen: 'detail', selected: a.id, from: from, highlight: null }); }
+
+  decide(a, verb) {
+    const first = a.owner.split(' ')[0];
+    const wasOff = !this.state.routing;
+    let line = '', dot = '#7fb3a0', msg = '', saved = 0, turnOn = false;
+
+    if (verb === 'Kill') {
+      saved = a.spend;
+      line = 'Key revoked at the gateway. ' + first + ' has the notice and the run rate drops by ' + usd(a.spend) + '.';
+      msg = 'Key pulled. ' + a.name + ' cannot reach a model as of now, and ' + first + ' has the notice.';
+      dot = '#c98b8b';
+    } else if (verb === 'Optimize') {
+      saved = a.saving;
+      turnOn = a.saving > 0;
+      line = turnOn
+        ? a.routeLine + ' About ' + usd(a.saving) + ' comes off the run rate, and the work itself is unchanged.'
+        : 'Nothing to reroute. The fix here sits upstream of the model, and ' + first + ' owns it.';
+      msg = turnOn
+        ? 'Rerouting ' + a.name + ' now. About ' + usd(a.saving) + ' leaves the run rate from the next call.'
+        : 'Nothing to reroute on ' + a.name + '. We logged the call and told ' + first + ' what is needed.';
+    } else if (verb === 'Keep') {
+      line = 'Kept on ' + a.tier + ', spend and all. It comes back to this page on Sep 25.';
+      msg = 'Kept. ' + a.name + ' is back on your desk Sep 25.';
+      dot = '#8fa8c9';
+    } else {
+      line = 'Ceiling lifted. More of the work routes here, and the claim stays on the books.';
+      msg = 'Ceiling lifted for ' + a.name + '. We keep reading it against the same claim.';
+    }
+
+    this.setState(s => ({
+      seq: s.seq + 1,
+      routing: s.routing || (verb === 'Optimize' && turnOn),
+      agents: s.agents.map(x => {
+        if (x.id !== a.id) return x;
+        const n = Object.assign({}, x, { decision: { verb: verb === 'Kill' ? 'Killed' : verb === 'Keep' ? 'Kept' : verb === 'Optimize' ? 'Optimized' : 'Expanded', line: line, on: 'Aug 26', saved: saved, seq: s.seq + 1 } });
+        if (verb === 'Kill') { n.status = 'Revoked'; }
+        if (verb === 'Keep') { n.review = 'Sep 25'; }
+        if (verb === 'Optimize' && turnOn) {
+          n.tier = x.routeTo || x.tier;
+          n.reroute = true;
+          n.flags = x.flags.map(f => f.title === 'Spend line'
+            ? Object.assign({}, f, { mark: 'Routed', state: 'pass', body: x.routeLine + ' Rerouted at the gateway on Aug 26, and the claim reading did not move with it.' })
+            : f);
+        }
+        return n;
+      })
+    }));
+
+    if (verb === 'Optimize' && turnOn && wasOff) {
+      this.flash(msg + ' Cost routing was off, so we turned it on for this agent alone.', dot);
+    } else {
+      this.flash(msg, dot);
+    }
+  }
+
+  reopen(a) {
+    return () => {
+      this.setState(s => ({ agents: s.agents.map(x => x.id === a.id ? Object.assign({}, x, { decision: null, status: x.status === 'Revoked' ? 'Flagged' : x.status }) : x) }));
+      this.flash('Back on the queue. ' + a.name + ' waits for a call again.', '#8fa8c9');
+    };
+  }
+
+  issueKey = () => {
+    const f = this.state.form;
+    if (!f.name.trim()) { this.setState({ formError: 'Give it a name, or Finance will not find it next month.' }); return; }
+    if (!f.owner.trim()) { this.setState({ formError: 'Put an owner on it. A kill notice goes to a person, not a team.' }); return; }
+    if (this.props.requireClaim !== false && !f.claimAmount.trim()) {
+      this.setState({ formError: 'Put a number on the value, or turn off the claim requirement and ship it Unquantified.' }); return;
+    }
+    const amt = parseFloat(f.claimAmount);
+    const hasClaim = !isNaN(amt) && amt > 0;
+    const runsGuess = { 'Every event': 3000, Hourly: 720, Daily: 30, Weekly: 4, Monthly: 1 }[f.frequency] || 30;
+    let claimUsd = null;
+    if (hasClaim) {
+      if (f.claimUnit === 'minutes per run') claimUsd = (amt / 60) * 65 * runsGuess;
+      else if (f.claimUnit === 'hours per run') claimUsd = amt * 65 * runsGuess;
+      else if (f.claimUnit === 'dollars per run') claimUsd = amt * runsGuess;
+      else claimUsd = amt;
+    }
+    const first = f.owner.trim().split(' ')[0];
+    const agent = {
+      id: 'n' + Date.now(),
+      name: f.name.trim(),
+      hypothesis: f.hypothesis.trim() || 'Work not described yet',
+      owner: f.owner.trim(), team: f.team, tier: f.tier, spend: 0, runs: 0,
+      claim: claimUsd, actual: null, status: 'Measuring', issued: 'Aug 26', reroute: f.routing, saving: 0,
+      claimNote: hasClaim ? f.claimAmount + ' ' + f.claimUnit + ', ' + f.claimType.toLowerCase() + ', running ' + f.frequency.toLowerCase() + '.' : 'Shipped with no claim on file.',
+      spendNote: 'Nothing metered yet. Spend shows up after the first call.',
+      actualNote: 'We wait for about 50 runs before putting a number here. Nothing is guessed in the meantime.',
+      confidence: null,
+      confidenceBasis: 'No traffic yet, so there is nothing to weigh. The first fifty runs give us a letter.',
+      confidenceLift: hasClaim ? 'Let it run. The grade writes itself from here.' : 'A claim would help too.',
+      boundary: hasClaim
+        ? 'Claimed, unverified. ' + first + ' set that number and we log it as theirs. We will test the work against it, never the person doing it.'
+        : 'No claim set, so there is nothing to hold this to. We will still read the work.',
+      ownerState: 'none', ownerLine: '', ownerReply: null,
+      flags: [
+        { title: 'Execution', mark: 'Waiting', state: 'warn', grade: '—', body: 'No completions seen yet. This opens on the first run.' },
+        { title: 'Output quality', mark: 'Waiting', state: 'warn', grade: '—', body: 'We score this against your work description once outputs exist.' },
+        { title: 'Spend line', mark: 'Waiting', state: 'warn', grade: '—', body: 'Set to ' + f.tier + '. We test a cheaper route after 50 runs.' }
+      ],
+      evidence: [
+        { label: 'Inputs used', value: 'Nothing yet. The key is live and the gateway is listening.' },
+        { label: 'Output size', value: 'No completions yet.' },
+        { label: 'Run to run', value: 'Needs two runs to compare.' },
+        { label: 'Model called', value: f.tier + ', as provisioned.' }
+      ],
+      killNote: first + ' hears first and has 48 hours to answer.',
+      optimizeNote: 'Nothing to reroute until there is traffic.'
+    };
+    this.setState(s => ({
+      agents: [agent].concat(s.agents), screen: 'portfolio', filter: 'All',
+      routing: s.routing || f.routing,
+      highlight: agent.id, formError: null, form: Object.assign({}, BLANK_FORM)
+    }));
+    this.flash(hasClaim ? 'Key issued. ' + agent.name + ' starts measuring on its first call.' : 'Key issued. ' + agent.name + ' ships Unquantified until someone names a number.', hasClaim ? '#7fb3a0' : '#d3b464');
+  };
+
+  meter(a) {
+    if (a.status === 'Revoked') return { fillW: '0%', tickL: '0%', fillColor: '#b7c1cc', meterLeft: 'key revoked', meterRight: 'no longer running' };
+    const claim = a.claim, actual = a.actual;
+    if (!claim && !actual) return { fillW: '0%', tickL: '0%', fillColor: '#b7c1cc', meterLeft: 'no claim', meterRight: 'unquantified' };
+    if (actual == null) return { fillW: '0%', tickL: '62%', fillColor: '#8a6a1f', meterLeft: 'claim ' + usd(claim), meterRight: a.status === 'Measuring' ? 'measuring' : 'no read yet' };
+    const max = Math.max(claim || 0, actual) * 1.18;
+    const pct = v => Math.min(100, (v / max) * 100).toFixed(1) + '%';
+    const ratio = claim ? actual / claim : 1;
+    const color = ratio >= 0.85 ? '#2f6b4f' : ratio >= 0.5 ? '#8a6a1f' : '#8f3b3b';
+    return { fillW: pct(actual), tickL: pct(claim), fillColor: color, meterLeft: 'claim ' + usd(claim), meterRight: 'actual ' + usd(actual) };
+  }
+
+  delta(a) {
+    if (a.actual == null || !a.claim) return { text: a.claim ? 'No read yet' : 'No claim set', bg: '#e6eaf0', fg: '#47535f' };
+    const r = a.actual / a.claim;
+    const of = Math.round(r * 100) + '% of claim';
+    if (r >= 0.85) return { text: of, bg: '#eaf2ed', fg: '#2f6b4f' };
+    return { text: of, bg: r >= 0.5 ? '#faf5e9' : '#f9eeee', fg: r >= 0.5 ? '#8a6a1f' : '#8f3b3b' };
+  }
+
+  gradeColor(g) {
+    if (!g) return '#7b8691';
+    const c = g.charAt(0);
+    return c === 'A' ? '#2f6b4f' : c === 'B' ? '#22375c' : '#8a6a1f';
+  }
+
+  verdictOf(a) {
+    if (a.status === 'Revoked') return 'Key revoked. Nothing runs.';
+    if (a.status === 'Measuring') return 'Key is live. No runs yet.';
+    if (!a.claim) return 'No claim set.';
+    if (a.actual == null) return 'No read yet.';
+    return 'Returning ' + Math.round((a.actual / a.claim) * 100) + '% of claim.';
+  }
+
+  chipStyle(active) {
+    return 'padding:8px 15px;border-radius:999px;cursor:pointer;font-size:12.5px;font-weight:500;border:1px solid ' +
+      (active ? '#22375c' : '#d5dce4') + ';background:' + (active ? '#22375c' : '#fff') + ';color:' + (active ? '#fff' : '#3a4652');
+  }
+
+  navStyle(active) {
+    return 'padding:7px 14px;border:0;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;' +
+      (active ? 'background:#fff;color:#141d27;box-shadow:0 1px 2px rgba(20,29,39,0.10);' : 'background:transparent;color:#59646f;');
+  }
+
+  needsCall(a) {
+    if (a.decision) return false;
+    if (a.status === 'Flagged') return true;
+    return a.status === 'Unverified' && a.spend > 0;
+  }
+
+  renderVals() {
+    const st = this.state;
+    const accent = this.props.accentColor || '#22375c';
+    const padY = this.props.density === 'compact' ? '12px' : '18px';
+    const A = st.agents;
+
+    const rows = A.filter(a => st.filter === 'All' ? true : a.status === st.filter).map(a => {
+      const flagged = a.status === 'Flagged';
+      return Object.assign({}, this.meter(a), {
+        id: a.id, name: a.name, hypothesis: a.hypothesis, owner: a.owner, team: a.team, tier: a.tier,
+        spend: usd(a.spend), runs: a.runs.toLocaleString('en-US'), status: a.status, pillStyle: pill(a.status),
+        read: a.confidence || '—', readColor: this.gradeColor(a.confidence),
+        hasDecision: !!a.decision, decisionMark: a.decision ? a.decision.verb + ' Aug 26' : '',
+        rowStyle: 'display:grid;grid-template-columns:2.1fr 1.1fr 0.9fr 0.85fr 0.85fr 0.7fr 0.95fr 0.62fr minmax(230px,1.9fr);gap:16px;align-items:center;padding:' + padY + ' 20px;border-bottom:1px solid #eff2f6;cursor:pointer;text-align:left;' +
+          (flagged ? 'box-shadow:inset 3px 0 0 #8f3b3b;' : '') + (a.status === 'Revoked' ? 'opacity:0.62;' : '') + (st.highlight === a.id ? 'animation:rowGlow 2600ms ease-out forwards;' : ''),
+        open: this.open(a, 'portfolio'),
+        onKey: e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.setState({ screen: 'detail', selected: a.id, from: 'portfolio', highlight: null }); } }
+      });
+    });
+
+    const flaggedList = A.filter(a => a.status === 'Flagged');
+    const decided = A.filter(a => !!a.decision);
+    const recovered = decided.reduce((t, a) => t + (a.decision.saved || 0), 0);
+    const sum = {
+      spend: usd(A.reduce((t, a) => t + a.spend, 0)),
+      countLabel: A.length + (A.length === 1 ? ' agent' : ' agents'),
+      tracking: A.filter(a => a.status === 'Tracking').length,
+      unverified: A.filter(a => a.status === 'Unverified').length,
+      flagged: flaggedList.length,
+      atRisk: usd(flaggedList.reduce((t, a) => t + a.spend, 0)),
+      hasRecovered: recovered > 0,
+      recovered: usd(recovered),
+      recoveredNote: count(decided.length) + (decided.length === 1 ? ' call made' : ' calls made') + ', off next month\'s run rate'
+    };
+
+    const queueList = A.filter(a => this.needsCall(a)).sort((x, y) => y.spend - x.spend);
+    const queue = queueList.map(a => {
+      const noRoute = !a.saving;
+      return {
+        id: a.id, name: a.name, who: a.owner + ' · ' + a.team + ' · ' + a.tier + ' tier',
+        status: a.status, pillStyle: pill(a.status),
+        edge: a.status === 'Flagged' ? '#8f3b3b' : '#8a6a1f',
+        verdict: this.verdictOf(a), verdictColor: a.status === 'Flagged' ? '#8f3b3b' : '#8a6a1f',
+        spend: usd(a.spend),
+        claim: a.claim ? usd(a.claim) : 'None',
+        actual: a.actual != null ? usd(a.actual) : 'Held back',
+        confidence: a.confidence || '—',
+        flags: a.flags.map(f => ({ chipStyle: chipFlag(f.state), chipLabel: f.title + ' · ' + f.mark })),
+        ownerLine: a.ownerLine || (a.owner.split(' ')[0] + ' was notified Aug 20 and has not answered yet.'),
+        hasReply: !!a.ownerReply, ownerReply: a.ownerReply || '',
+        actionNote: noRoute ? a.optimizeNote : 'Optimize is the only one of these we run for you. ' + a.optimizeNote,
+        open: this.open(a, 'decisions'),
+        onKill: () => this.decide(a, 'Kill'),
+        onKeep: () => this.decide(a, 'Keep'),
+        onOptimize: () => this.decide(a, 'Optimize'),
+        onExpand: () => this.decide(a, 'Expand')
+      };
+    });
+
+    const settled = decided.slice().sort((x, y) => (y.decision.seq || 0) - (x.decision.seq || 0)).map(a => ({
+      name: a.name, verb: a.decision.verb, verbStyle: verbStyle(a.decision.verb), line: a.decision.line,
+      open: this.open(a, 'decisions')
+    }));
+
+    const stake = queueList.reduce((t, a) => t + a.spend, 0);
+    const answered = queueList.filter(a => a.ownerState === 'answered').length;
+    const queueLead = queueList.length === 0
+      ? 'Nothing is waiting on you.'
+      : count(queueList.length) + (queueList.length === 1 ? ' agent wants a call. ' : ' agents want a call. ') + usd(stake) +
+        ' of monthly spend sits behind them, and ' + (answered === 0 ? 'no owner has answered yet.' : answered === queueList.length ? 'every owner has answered.' : count(answered).toLowerCase() + ' of them have answered.');
+
+    const sel = A.filter(a => a.id === st.selected)[0];
+    let d = null;
+    if (sel) {
+      const dl = this.delta(sel);
+      const c = STATUS[sel.status] || STATUS.Measuring;
+      const share = sel.actual != null && sel.claim ? Math.round((sel.actual / sel.claim) * 100) : null;
+      const verdict = sel.status === 'Revoked' ? 'Key revoked on Aug 26.'
+        : sel.status === 'Flagged' ? (share != null ? 'Returning ' + share + '% of its claim.' : 'Returning far less than its claim.')
+        : sel.status === 'Tracking' ? 'Holding its claim.'
+        : sel.status === 'Measuring' ? 'Key is live. No runs yet.'
+        : 'Running, but not measurable yet.';
+      const verdictSub = sel.status === 'Revoked' ? 'The gateway turns its calls away. Nothing else here changes.'
+        : sel.status === 'Flagged' ? 'Two of three flags are failing. This one wants a decision this month.'
+        : sel.status === 'Tracking' ? 'Actual sits inside tolerance. Nothing to do.'
+        : sel.status === 'Measuring' ? 'A number appears here after roughly 50 runs.'
+        : sel.claim ? 'Nobody uses the output, so there is no value to price.' : 'No claim was set when the key was issued.';
+      d = Object.assign({}, sel, {
+        spend: usd(sel.spend),
+        claim: sel.claim ? usd(sel.claim) : 'None',
+        actual: sel.actual != null ? usd(sel.actual) : sel.status === 'Measuring' ? 'Measuring' : 'Held back',
+        delta: dl.text, deltaBg: dl.bg, deltaFg: dl.fg,
+        pillStyle: pill(sel.status),
+        routingLabel: sel.reroute ? 'routing on' : 'routing off',
+        verdict: verdict, verdictSub: verdictSub,
+        verdictStyle: 'padding:16px 20px;border-radius:11px;border:1px solid ' + c.bd + ';border-left:4px solid ' + c.fg + ';background:' + c.bg + ';color:' + (sel.status === 'Measuring' || sel.status === 'Revoked' ? '#232e39' : c.fg),
+        confidence: sel.confidence || 'No read yet',
+        confidenceColor: this.gradeColor(sel.confidence),
+        flags: sel.flags.map(f => Object.assign({}, f, { markStyle: markStyle(f.state) })),
+        showOwner: sel.ownerState === 'answered' || sel.ownerState === 'silent',
+        hasReply: !!sel.ownerReply,
+        ownerReply: sel.ownerReply || '',
+        reviewDate: 'Sep 25',
+        open: !sel.decision,
+        settledView: !!sel.decision,
+        settledVerb: sel.decision ? sel.decision.verb : '',
+        settledOn: sel.decision ? sel.decision.on : '',
+        settledLine: sel.decision ? sel.decision.line : '',
+        settledEdge: sel.decision ? VERB[sel.decision.verb].fg : '#47535f',
+        onReopen: this.reopen(sel),
+        decisionNote: sel.status === 'Measuring' ? 'Four verbs, one call. Most of them wait for evidence, but you can still pull the key if it was a mistake.' : 'Four verbs, one call. Only one of these is ours to run for you.',
+        onKill: () => this.decide(sel, 'Kill'),
+        onKeep: () => this.decide(sel, 'Keep'),
+        onOptimize: () => this.decide(sel, 'Optimize'),
+        onExpand: () => this.decide(sel, 'Expand')
+      });
+    }
+
+    const routedCount = A.filter(a => a.reroute && a.status !== 'Revoked').length;
+    const liveCount = A.filter(a => a.status !== 'Revoked').length;
+    const revokedList = A.filter(a => a.status === 'Revoked');
+    const gw = {
+      url: 'https://gw.ledger.io/v1',
+      key: 'lg_live_••••••••' + st.keySuffix,
+      switchState: st.routing ? 'On' : 'Off',
+      switchPill: st.routing ? pill('Tracking') : pill('Measuring'),
+      switchLabel: st.routing ? 'Turn it off' : 'Turn on cost routing',
+      switchBtn: st.routing
+        ? 'padding:11px 18px;border:1px solid #d5dce4;border-radius:8px;background:#fff;font-weight:600;cursor:pointer;white-space:nowrap'
+        : 'padding:11px 18px;border:0;border-radius:8px;background:' + accent + ';color:#fff;font-weight:600;cursor:pointer;white-space:nowrap',
+      routingStyle: 'margin-top:16px;padding:22px 24px;border-radius:12px;border:1px solid ' + (st.routing ? '#cfe0d6' : '#dde3ea') + ';background:' + (st.routing ? '#f4f9f6' : '#fff'),
+      routingFg: st.routing ? '#2c4a3b' : '#59646f',
+      routingCopy: st.routing
+        ? 'On, for ' + count(routedCount).toLowerCase() + ' ' + (routedCount === 1 ? 'agent' : 'agents') + ' and no others. We move those calls to a cheaper model and leave the rest exactly as their owners wrote them.'
+        : 'Off, and it stays off until you say otherwise. We read every call and grade it, but we move nothing. Trust the readings first. Then hand us the wheel, one agent at a time.',
+      reads: [
+        { text: 'The request: prompt, system text, and whatever agents.md and task files ride along with it.' },
+        { text: 'The completion in full, every time.' },
+        { text: 'Retries, latency, token counts, and which model actually answered.' }
+      ],
+      avoids: [
+        { text: 'The human. No stopwatch, no keystrokes, nothing on anyone\'s screen.' },
+        { text: 'The downstream. What your business does with a redlined contract happens out of our sight, and we refuse to price it.' }
+      ],
+      revoked: revokedList.map(a => ({ name: a.name, line: a.owner + ' · pulled Aug 26 · ' + usd(a.spend) + ' off the run rate' })),
+      noRevoked: revokedList.length === 0,
+      calls: A.reduce((t, a) => t + a.runs, 0).toLocaleString('en-US'),
+      live: String(liveCount),
+      routed: String(routedCount)
+    };
+
+    const f = st.form;
+    return {
+      accent: accent,
+      headerPeriod: 'August 2026',
+      nav: {
+        portfolio: this.navStyle(st.screen === 'portfolio' || st.screen === 'detail'),
+        decisions: this.navStyle(st.screen === 'decisions'),
+        gateway: this.navStyle(st.screen === 'gateway'),
+        badge: 'display:inline-block;min-width:18px;padding:1px 6px;border-radius:999px;background:#8f3b3b;color:#fff;font-family:\'IBM Plex Mono\',monospace;font-size:11px;font-weight:600;text-align:center'
+      },
+      isPortfolio: st.screen === 'portfolio',
+      isDecisions: st.screen === 'decisions',
+      isDetail: st.screen === 'detail' && !!d,
+      isGateway: st.screen === 'gateway',
+      isProvision: st.screen === 'provision',
+      goPortfolio: () => this.setState({ screen: 'portfolio', formError: null }),
+      goDecisions: () => this.setState({ screen: 'decisions', highlight: null }),
+      goGateway: () => this.setState({ screen: 'gateway', highlight: null }),
+      goProvision: () => this.setState({ screen: 'provision', formError: null, highlight: null }),
+      goBack: () => this.setState({ screen: st.from === 'decisions' ? 'decisions' : 'portfolio' }),
+      backLabel: st.from === 'decisions' ? '← Decisions' : '← Portfolio',
+      rows: rows, noRows: rows.length === 0, sum: sum, d: d,
+      queue: queue, queueEmpty: queue.length === 0, queueCount: String(queue.length),
+      hasQueue: queue.length > 0, queueLead: queueLead,
+      settled: settled, hasSettled: settled.length > 0,
+      gw: gw,
+      toggleRouting: () => {
+        const on = !this.state.routing;
+        this.setState({ routing: on });
+        this.flash(on ? 'Cost routing is on. We move only the agents you approved, and nothing else.' : 'Cost routing is off. We read every call and touch none of them.', on ? '#7fb3a0' : '#8fa8c9');
+      },
+      rotateKey: () => {
+        const next = String(1000 + Math.floor(Math.random() * 8999));
+        this.setState({ keySuffix: next });
+        this.flash('New key live. The old one stops working in an hour, so move your services now.', '#d3b464');
+      },
+      rowCountLabel: rows.length + (rows.length === 1 ? ' agent' : ' agents') + ' shown',
+      chip: { all: this.chipStyle(st.filter === 'All'), flagged: this.chipStyle(st.filter === 'Flagged'), unverified: this.chipStyle(st.filter === 'Unverified') },
+      filterAll: () => this.setState({ filter: 'All' }),
+      filterFlagged: () => this.setState({ filter: 'Flagged' }),
+      filterUnverified: () => this.setState({ filter: 'Unverified' }),
+      form: f,
+      setName: this.set('name'), setOwner: this.set('owner'), setTeam: this.set('team'),
+      setFrequency: this.set('frequency'), setHypothesis: this.set('hypothesis'),
+      setClaimType: this.set('claimType'), setClaimAmount: this.set('claimAmount'), setClaimUnit: this.set('claimUnit'),
+      tierChip: {
+        Economy: this.chipStyle(f.tier === 'Economy'),
+        Optimized: this.chipStyle(f.tier === 'Optimized'),
+        Frontier: this.chipStyle(f.tier === 'Frontier')
+      },
+      setTierEconomy: () => this.setState(s => ({ form: Object.assign({}, s.form, { tier: 'Economy' }) })),
+      setTierOptimized: () => this.setState(s => ({ form: Object.assign({}, s.form, { tier: 'Optimized' }) })),
+      setTierFrontier: () => this.setState(s => ({ form: Object.assign({}, s.form, { tier: 'Frontier' }) })),
+      routeChip: { off: this.chipStyle(!f.routing), on: this.chipStyle(!!f.routing) },
+      setRoutingOff: () => this.setState(s => ({ form: Object.assign({}, s.form, { routing: false }) })),
+      setRoutingOn: () => this.setState(s => ({ form: Object.assign({}, s.form, { routing: true }) })),
+      showUnquantified: !f.claimAmount.trim(),
+      formError: st.formError,
+      issueKey: this.issueKey,
+      toast: st.toast, toastDot: st.toastDot
+    };
+  }
+}
+
+</script>
+</body>
+</html>
