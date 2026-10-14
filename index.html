@@ -42,6 +42,8 @@
   @keyframes gateDrop { 0% { opacity: 0; transform: translateY(-26px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
   @keyframes caret { 50% { opacity: 0; } }
   @keyframes cardIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+  .split { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(26px, 5vw, 68px); align-items: start; }
+  @media (max-width: 820px) { .split { grid-template-columns: 1fr; gap: 26px; } }
   @media (max-width: 760px) { .nav-links, .nav-tagline { display: none !important; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
@@ -77,7 +79,7 @@
         <p style="margin:22px 0 0;font-size:18.5px;color:#5C564D;max-width:50ch;text-wrap:pretty">Every agent made a promise to get funded. Ledger reads the traffic and tells you which ones kept it.</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:30px">
           <a href="#walkthrough" style="padding:14px 25px;border-radius:9px;background:#17140F;color:#FBFAF7;font-weight:600" style-hover="background:#000;text-decoration:none">Book a walkthrough</a>
-          <a href="#leak" style="padding:14px 23px;border-radius:9px;border:1px solid #E7E3DA;color:#17140F;font-weight:600;background:#fff" style-hover="border-color:#C9C2B5;text-decoration:none">See what it catches</a>
+          <a href="#leak" style="align-self:center;font-weight:600;color:#17140F;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;text-decoration-color:#C9C2B5" style-hover="text-decoration-color:#17140F">See what it catches</a>
         </div>
         <p style="margin:24px 0 0;font-size:14.5px;color:#8A8275">Everything below is live. Go and poke it.</p>
       </div>
@@ -172,31 +174,26 @@
     </div>
   </section>
 
-  <section style="padding:clamp(34px,5vw,52px) clamp(20px,4vw,38px);border-top:1px solid #E7E3DA">
-    <div style="max-width:1220px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(24px,3vw,40px)">
-      <div>
-        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.012em">Every new model raises the bill</div>
-        <p style="margin:9px 0 0;color:#5C564D;font-size:16px;text-wrap:pretty">Hardly any of the work needed the expensive one, and nobody picking a model pays for it.</p>
-      </div>
-      <div>
-        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.012em">The case is written by the owner</div>
-        <p style="margin:9px 0 0;color:#5C564D;font-size:16px;text-wrap:pretty">Whoever asks for the budget also writes the number that wins it, and nobody opens it again.</p>
-      </div>
-      <div>
-        <div style="font-family:'Outfit',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.012em">So finance caps everyone</div>
-        <p style="margin:9px 0 0;color:#5C564D;font-size:16px;text-wrap:pretty">It is the last lever left when waste and wins look identical on an invoice.</p>
+  <section style="padding:clamp(30px,4vw,44px) clamp(20px,4vw,38px);border-top:1px solid #E7E3DA">
+    <div class="split" style="max-width:1220px;margin:0 auto">
+      <p style="margin:0;font-family:'Outfit',sans-serif;font-size:clamp(21px,2.5vw,29px);line-height:1.3;font-weight:500;letter-spacing:-0.02em;color:#17140F;text-wrap:pretty">Hardly any of the work needed the expensive model, and nobody choosing one pays for it.</p>
+      <div style="display:flex;flex-direction:column;gap:20px;padding-top:5px">
+        <div>
+          <div style="font-weight:600;margin-bottom:5px">The case is written by the owner</div>
+          <p style="margin:0;color:#5C564D;font-size:16px;text-wrap:pretty">Whoever asks for the budget also writes the number that wins it, and nobody opens it again.</p>
+        </div>
+        <div>
+          <div style="font-weight:600;margin-bottom:5px">So finance caps everyone</div>
+          <p style="margin:0;color:#5C564D;font-size:16px;text-wrap:pretty">It is the last lever left when waste and wins look identical on an invoice.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="pane" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px);background:#fff;border-top:1px solid #E7E3DA;border-bottom:1px solid #E7E3DA">
-    <div style="max-width:1120px;margin:0 auto">
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
-        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
-        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">ONE PANE</span>
-      </div>
+  <section id="pane" style="padding:clamp(58px,9vw,104px) clamp(20px,4vw,38px) clamp(44px,6vw,70px);background:#fff;border-top:1px solid #E7E3DA;border-bottom:1px solid #E7E3DA">
+    <div style="max-width:1280px;margin:0 auto">
       <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:21ch;text-wrap:balance">Every agent in the company, on one page.</h2>
-      <p style="margin:0 0 26px;color:#5C564D;max-width:54ch;text-wrap:pretty">Every agent holding a key, and what it has cost you this month.</p>
+      <p style="margin:0 0 26px;color:#5C564D;max-width:44ch;text-wrap:pretty">Every agent holding a key, and what it has cost you this month.</p>
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:#E7E3DA;border:1px solid #E7E3DA;border-radius:12px;overflow:hidden;margin-bottom:18px">
         <div style="background:#fff;padding:17px 19px;">
           <div style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#8A8275">AI SPEND</div>
@@ -278,13 +275,9 @@
       <p style="margin:16px 2px 0;color:#5C564D;max-width:58ch;text-wrap:pretty">Shadow AI stops being shadow the moment a key is the only way to reach a model.</p>
     </div>
   </section>
-  <section id="gap" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px)">
+  <section id="gap" style="padding:clamp(40px,5vw,58px) clamp(20px,4vw,38px)">
     <div style="max-width:1120px;margin:0 auto">
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
-        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
-        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">WHERE WE SIT</span>
-      </div>
-      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:20ch;text-wrap:balance">There is a hole between your agents and the bill.</h2>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:27ch;text-wrap:pretty">There is a hole between your agents and the bill, and it gets more expensive every month.</h2>
       <p style="margin:0 0 26px;color:#5C564D;max-width:56ch;text-wrap:pretty">One key, one gateway. Watch what changes when something is standing in the path.</p>
 
       <div style="background:#E8F0FB;border-radius:18px;padding:clamp(22px,3.5vw,32px)">
@@ -332,11 +325,11 @@
     </div>
   </section>
 
-  <section id="leak" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px)">
+  <section id="leak" style="padding:clamp(62px,8vw,90px) clamp(20px,4vw,38px)">
     <div style="max-width:1120px;margin:0 auto">
       <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
         <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
-        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">THE LEAK</span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">01 &middot; THE LEAK</span>
       </div>
       <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:21ch;text-wrap:balance">Most of the bill is a frontier model doing easy work.</h2>
       <p style="margin:0 0 26px;color:#5C564D;max-width:54ch;text-wrap:pretty">Pick a task. Drag the volume to yours.</p>
@@ -387,11 +380,11 @@
     </div>
   </section>
 
-  <section id="read" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px);background:#fff;border-top:1px solid #E7E3DA;border-bottom:1px solid #E7E3DA">
+  <section id="read" style="padding:clamp(46px,6vw,68px) clamp(20px,4vw,38px);background:#fff;border-top:1px solid #E7E3DA;border-bottom:1px solid #E7E3DA">
     <div style="max-width:1120px;margin:0 auto">
       <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
         <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
-        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">THE READ</span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">02 &middot; THE READ</span>
       </div>
       <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:22ch;text-wrap:balance">The owner names a number. We go and check it.</h2>
       <p style="margin:0 0 24px;color:#5C564D;max-width:56ch;text-wrap:pretty">The real screen. Pick an agent and watch the two figures separate.</p>
@@ -482,11 +475,11 @@
     </div>
   </section>
 
-  <section id="call" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px)">
+  <section id="call" style="padding:clamp(62px,8vw,92px) clamp(20px,4vw,38px)">
     <div style="max-width:1120px;margin:0 auto">
       <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
         <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
-        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">THE CALL</span>
+        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">03 &middot; THE CALL</span>
       </div>
       <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:20ch;text-wrap:balance">Every flag ends in one of four decisions.</h2>
       <p style="margin:0 0 26px;color:#5C564D;max-width:56ch;text-wrap:pretty">The owner answers first, then you choose. Kill and Optimize take effect at the gateway, not in an email.</p>
@@ -551,12 +544,8 @@
     </div>
   </section>
 
-  <section id="trust" style="padding:clamp(48px,7vw,78px) clamp(20px,4vw,38px);background:#F4F2ED;border-top:1px solid #E7E3DA">
+  <section id="trust" style="padding:clamp(42px,5vw,62px) clamp(20px,4vw,38px);background:#F4F2ED;border-top:1px solid #E7E3DA">
     <div style="max-width:1120px;margin:0 auto">
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:13px">
-        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
-        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">WHAT WE KEEP</span>
-      </div>
       <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:20ch;text-wrap:balance">We read the call. We don&#39;t keep it.</h2>
       <p style="margin:0 0 26px;color:#5C564D;max-width:56ch;text-wrap:pretty">Grading runs in memory while the request is in flight. The prompt and the completion are gone by the time the response reaches your agent.</p>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
@@ -595,10 +584,6 @@
 
   <section style="padding:clamp(44px,6vw,66px) clamp(20px,4vw,38px);background:#fff;border-top:1px solid #E7E3DA">
     <div style="max-width:1120px;margin:0 auto">
-      <div style="display:flex;align-items:center;gap:9px;margin-bottom:22px">
-        <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
-        <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">ENDORSED BY</span>
-      </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px">
         <div style="background:#E8F0FB;border-radius:16px;padding:24px 26px;display:flex;flex-direction:column">
           <svg width="22" height="18" viewBox="0 0 22 18" fill="none" aria-hidden="true" style="margin-bottom:14px">
