@@ -64,6 +64,7 @@
         <a href="#call" style="font-size:14.5px;color:#5C564D" style-hover="color:#17140F;text-decoration:none">The call</a>
         <a href="#trust" style="font-size:14.5px;color:#5C564D" style-hover="color:#17140F;text-decoration:none">What we keep</a>
       </span>
+      <a href="/app" style="font-size:14.5px;font-weight:600;color:#17140F" style-hover="color:#000">Sign in</a>
       <a href="#walkthrough" style="padding:10px 18px;border-radius:8px;background:#17140F;color:#FBFAF7;font-weight:600;font-size:14.5px" style-hover="background:#000;text-decoration:none">Book a walkthrough</a>
     </div>
   </header>
@@ -76,7 +77,7 @@
           <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">COST CONTROL FOR AI SPEND</span>
         </div>
         <h1 style="margin:0;font-family:'Outfit',sans-serif;font-size:clamp(37px,5vw,64px);line-height:1.04;font-weight:600;letter-spacing:-0.035em;text-wrap:balance">Your model bill doubled. Your evidence didn't.</h1>
-        <p style="margin:22px 0 0;font-size:18.5px;color:#5C564D;max-width:50ch;text-wrap:pretty">Every agent made a promise to get funded. Ivy ROI reads the traffic and tells you which ones kept it.</p>
+        <p style="margin:22px 0 0;font-size:18.5px;color:#5C564D;max-width:50ch;text-wrap:pretty">Every agent made a promise to get funded. We meter what it really costs, and go asking the people who use it whether the promise held.</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:30px">
           <a href="#walkthrough" style="padding:14px 25px;border-radius:9px;background:#17140F;color:#FBFAF7;font-weight:600" style-hover="background:#000;text-decoration:none">Book a walkthrough</a>
           <a href="#leak" style="align-self:center;font-weight:600;color:#17140F;text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;text-decoration-color:#C9C2B5" style-hover="text-decoration-color:#17140F">See what it catches</a>
@@ -389,8 +390,8 @@
         <span style="width:6px;height:6px;border-radius:50%;background:#1B4FC4"></span>
         <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;color:#8A8275">02 &middot; THE READ</span>
       </div>
-      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:22ch;text-wrap:balance">The owner names a number. We go and check it.</h2>
-      <p style="margin:0 0 24px;color:#5C564D;max-width:56ch;text-wrap:pretty">The real screen. Pick an agent and watch the two figures separate.</p>
+      <h2 style="margin:0 0 10px;font-family:'Outfit',sans-serif;font-size:clamp(28px,3.4vw,40px);font-weight:600;letter-spacing:-0.028em;line-height:1.12;max-width:22ch;text-wrap:balance">The owner names a number. We price it and go asking.</h2>
+      <p style="margin:0 0 24px;color:#5C564D;max-width:56ch;text-wrap:pretty">The real screen. Spend is ours and exact. What the work is worth comes from the people who use it.</p>
 
       <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px">
         <sc-for list="{{ agents }}" as="g" hint-placeholder-count="3">
@@ -433,7 +434,7 @@
             <div style="background:#fff;padding:17px 19px;box-shadow:inset 3px 0 0 #1B4FC4">
               <div style="display:flex;align-items:center;gap:7px">
                 <span style="width:7px;height:7px;border-radius:2px;background:#1B4FC4"></span>
-                <span style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#1B4FC4">WHAT THE WORK PROVES</span>
+                <span style="font-size:11.5px;font-weight:600;letter-spacing:0.05em;color:#1B4FC4">WHAT THE EVIDENCE SAYS</span>
               </div>
               <div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;color:#1B4FC4;margin-top:8px">{{ read.actual }}</div>
               <div style="display:inline-block;margin-top:6px;padding:2px 9px;border-radius:5px;background:{{ read.deltaBg }};color:{{ read.deltaFg }};font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500">{{ read.delta }}</div>
@@ -473,7 +474,7 @@
 
       <div style="display:flex;gap:14px;margin-top:18px;padding:17px 20px;background:#F4F2ED;border-radius:12px">
         <div style="font-size:13.5px;font-weight:600;color:#8A6A1F;white-space:nowrap">Where we stop</div>
-        <div style="font-size:15px;color:#4F483B;text-wrap:pretty">We read the agent, never the person beside it. Marco's eight minutes an invoice stays marked claimed, unverified until the work backs it up.</div>
+        <div style="font-size:15px;color:#4F483B;text-wrap:pretty">We see one round trip: the question out, the answer back, the price. What happens to that answer is out of our sight, so what an agent is worth comes from the people who use it, never from us guessing. Marco's eight minutes stays claimed, unverified until they say otherwise.</div>
       </div>
     </div>
   </section>
@@ -715,20 +716,20 @@ const AGENTS = [
     claim: 28000, spend: 9480, actual: 5040, grade: 'B',
     claimNote: 'Eight minutes an invoice, 3,500 a month.',
     spendNote: '$2.42 a call, across 3,910 calls.',
-    gradeNote: 'Seven months of traffic, plus every GL code AP quietly changed afterwards. A week of split traffic takes this to A.',
+    gradeNote: 'Seven months of metered traffic, and nine of the fourteen people in AP answered when we asked. Priced at the bottom of their band, so it reads as a floor.',
     flags: [
       { title: 'Execution', mark: 'Warn', state: 'warn', body: 'It runs on everything, but 82% of calls echo fields the ERP already had.' },
-      { title: 'Output quality', mark: 'Fail', state: 'fail', body: 'On the invoices that need judgment, AP changed the GL code 31% of the time.' },
+      { title: 'Output quality', mark: 'Fail', state: 'fail', body: 'Of the nine in AP who answered, seven fix the coding before it posts.' },
       { title: 'Spend line', mark: 'Fail', state: 'fail', body: 'Frontier tier on extraction work. Economy matches it.' }
     ] },
   { name: 'Support Draft Assistant', who: 'Priya Raman · Support · Optimized tier', status: 'Tracking', tone: 'pass',
     claim: 9000, spend: 2340, actual: 10400, grade: 'A',
     claimNote: 'Four minutes a ticket, 6,000 tickets a month.',
     spendNote: '6,120 runs. Thirty-eight cents each.',
-    gradeNote: 'Six thousand runs a month, with a send-or-rewrite signal we can read on every one.',
+    gradeNote: 'Six thousand runs a month, and eleven of the support team answered. Thin, but it is their number rather than Priya\'s.',
     flags: [
       { title: 'Execution', mark: 'Pass', state: 'pass', body: 'Pulls the thread and the account record on every run.' },
-      { title: 'Output quality', mark: 'Pass', state: 'pass', body: '71% of drafts go out with minor edits. Escalations held flat.' },
+      { title: 'Output quality', mark: 'Pass', state: 'pass', body: 'Nine of the eleven who answered said a draft saves them five to ten minutes.' },
       { title: 'Spend line', mark: 'Pass', state: 'pass', body: 'Economy drafts were rejected twice as often. This is the right floor.' }
     ] },
   { name: 'Security Log Reviewer', who: 'Lena Fischer · IT Security · Frontier tier', status: 'Flagged', tone: 'fail',
